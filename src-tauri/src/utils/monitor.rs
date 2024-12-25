@@ -3,8 +3,7 @@ use cocoa::foundation::{NSPoint, NSRect};
 use objc::{class, msg_send, sel, sel_impl};
 use tauri::AppHandle;
 
-#[tauri::command]
-pub fn get_active_monitor(app_handle: AppHandle) -> Option<tauri::Monitor> {
+pub fn get_active_monitor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     unsafe {
         // 获取鼠标位置
         let mouse_location: NSPoint = msg_send![class!(NSEvent), mouseLocation];
@@ -13,8 +12,7 @@ pub fn get_active_monitor(app_handle: AppHandle) -> Option<tauri::Monitor> {
         let screens: id = msg_send![class!(NSScreen), screens];
         let count: usize = msg_send![screens, count];
 
-        let handle = app_handle.to_owned();
-        let monitors = handle.available_monitors().expect("获取显示器失败");
+        let monitors = app_handle.available_monitors().expect("获取显示器失败");
 
         // 遍历所有屏幕找到包含鼠标的那个
         for i in 0..count {

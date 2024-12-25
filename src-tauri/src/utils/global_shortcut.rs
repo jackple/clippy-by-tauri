@@ -10,9 +10,9 @@ pub fn register(app: &tauri::App) {
             .unwrap()
             .with_handler(|app_handle, shortcut, event| {
                 if event.state == ShortcutState::Pressed {
-                    println!("shortcut: {:#?}", shortcut);
+                    // println!("shortcut: {:#?}", shortcut);
                     if shortcut.matches(Modifiers::SHIFT | Modifiers::SUPER, Code::KeyB) {
-                        nspanel::show_panel(app_handle.to_owned());
+                        nspanel::toggle_panel(app_handle.to_owned());
                     }
                 }
             })

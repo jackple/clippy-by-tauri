@@ -8,8 +8,7 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_nspanel::init())
         .invoke_handler(tauri::generate_handler![
-            utils::nspanel::show_panel,
-            utils::nspanel::hide_panel,
+            utils::nspanel::toggle_panel,
             utils::nspanel::close_panel,
         ])
         .setup(|app| {
@@ -18,7 +17,6 @@ pub fn run() {
             // debug(&app);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![utils::monitor::get_active_monitor,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

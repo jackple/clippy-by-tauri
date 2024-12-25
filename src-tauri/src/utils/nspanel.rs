@@ -1,4 +1,5 @@
-use tauri::{AppHandle, Manager, WebviewWindow};
+use crate::utils::monitor;
+use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 use tauri_nspanel::{panel_delegate, ManagerExt, WebviewWindowExt};
 
 pub fn init(app: &tauri::App) {
@@ -28,21 +29,37 @@ pub fn init(app: &tauri::App) {
     panel.set_delegate(delegate);
 }
 
-#[tauri::command]
-pub fn show_panel(handle: AppHandle) {
-    let panel = handle.get_webview_panel("main").unwrap();
-    panel.show();
-}
+const WIN_HEIGHT: f64 = 322.0;
 
 #[tauri::command]
-pub fn hide_panel(handle: AppHandle) {
+pub fn toggle_panel(handle: AppHandle) {
     let panel = handle.get_webview_panel("main").unwrap();
-    panel.order_out(None);
+
+    if panel.is_visible() {
+        panel.order_out(None);
+        return;
+    }
+
+    let monitor = monitor::get_active_monitor(&handle);
+    if let Some(m) = monitor {
+        let win = handle.get_webview_window("main").unwrap();
+        let size = m.size().to_logical(m.scale_factor());
+        let position = m.position();
+
+        let _ = win.set_size(LogicalSize::new(size.width, WIN_HEIGHT));
+        let _ = win.set_position(LogicalPosition::new(
+            position.x as f64,
+            size.height - WIN_HEIGHT + position.y as f64,
+        ));
+    }
+
+    panel.show();
 }
 
 #[tauri::command]
 pub fn close_panel(handle: AppHandle) {
     let panel = handle.get_webview_panel("main").unwrap();
+
     panel.released_when_closed(true);
     panel.close();
 }
