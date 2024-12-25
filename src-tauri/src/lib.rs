@@ -13,21 +13,18 @@ pub fn run() {
             utils::nspanel::close_panel,
         ])
         .setup(|app| {
-            let app_handle = app.app_handle();
-            utils::nspanel::init(app_handle);
-            let window = app.get_webview_window("main").unwrap();
-            window.open_devtools();
+            utils::nspanel::init(&app);
+            utils::global_shortcut::register(&app);
+            // debug(&app);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            greet,
-            utils::monitor::get_active_monitor,
-        ])
+        .invoke_handler(tauri::generate_handler![utils::monitor::get_active_monitor,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+#[allow(dead_code)]
+fn debug(app: &tauri::App) {
+    let window = app.get_webview_window("main").unwrap();
+    window.open_devtools();
 }

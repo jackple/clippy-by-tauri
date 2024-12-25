@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { invoke } from "@tauri-apps/api/core"
 
 import { initDatabase, getItems, addItem, type Item } from "./utils/db"
 import winAdjust from "./utils/winAdjust"
@@ -7,16 +6,12 @@ import styles from "./App.module.scss"
 import reactLogo from "./assets/react.svg"
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("")
-  const [name, setName] = useState("")
   const [items, setItems] = useState<Item[]>([])
 
   useEffect(() => {
     initDatabase().then(() => {
       loadItems()
     })
-
-    winAdjust()
   }, [])
 
   async function loadItems() {
@@ -27,11 +22,6 @@ function App() {
   async function handleAddItem() {
     await addItem("测试标题", "测试内容")
     await loadItems()
-  }
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }))
   }
 
   return (
@@ -65,22 +55,6 @@ function App() {
         </a>
       </div>
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className={styles.row}
-        onSubmit={(e) => {
-          e.preventDefault()
-          greet()
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
     </main>
   )
 }

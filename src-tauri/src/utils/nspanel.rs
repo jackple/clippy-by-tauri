@@ -1,8 +1,9 @@
 use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_nspanel::{panel_delegate, ManagerExt, WebviewWindowExt};
 
-pub fn init(app_handle: &AppHandle) {
-    let window: WebviewWindow = app_handle.get_webview_window("main").unwrap();
+pub fn init(app: &tauri::App) {
+    let handle = app.app_handle().to_owned();
+    let window: WebviewWindow = handle.get_webview_window("main").unwrap();
 
     let panel = window.to_panel().unwrap();
 
@@ -10,8 +11,6 @@ pub fn init(app_handle: &AppHandle) {
         window_did_become_key,
         window_did_resign_key
     });
-
-    let handle = app_handle.to_owned();
 
     delegate.set_listener(Box::new(move |delegate_name: String| {
         match delegate_name.as_str() {
