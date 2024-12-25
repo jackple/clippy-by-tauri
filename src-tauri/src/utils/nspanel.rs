@@ -10,14 +10,13 @@ pub fn init(app: &tauri::App) {
 
     let delegate = panel_delegate!(MyPanelDelegate {
         window_did_become_key,
-        window_did_resign_key
+        window_did_resign_key,
     });
 
     delegate.set_listener(Box::new(move |delegate_name: String| {
         match delegate_name.as_str() {
             "window_did_become_key" => {
-                let app_name = handle.package_info().name.to_owned();
-                println!("[info]: {:?} panel becomes key window!", app_name);
+                println!("[info]: panel becomes key window!");
             }
             "window_did_resign_key" => {
                 println!("[info]: panel resigned from key window!");
