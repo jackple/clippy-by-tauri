@@ -11,7 +11,7 @@ pub fn register(app: &tauri::App) {
             .with_handler(|app_handle, shortcut, event| {
                 if event.state == ShortcutState::Pressed {
                     println!("shortcut: {:#?}", shortcut);
-                    if shortcut.matches(Modifiers::SHIFT, Code::KeyV) {
+                    if shortcut.matches(Modifiers::SHIFT | Modifiers::SUPER, Code::KeyB) {
                         nspanel::show_panel(app_handle.to_owned());
                     }
                 }
@@ -19,8 +19,3 @@ pub fn register(app: &tauri::App) {
             .build(),
     );
 }
-
-// fn toggle_main_window(app: &tauri::App) {
-//     let window = app.get_webview_window("main").unwrap();
-//     // window.toggle();
-// }
