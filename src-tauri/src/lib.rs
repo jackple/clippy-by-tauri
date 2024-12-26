@@ -14,6 +14,9 @@ pub fn run() {
         .setup(|app| {
             utils::nspanel::init(&app);
             utils::global_shortcut::register(&app);
+            // 隐藏dock icon
+            hide_dock_icon(app);
+
             // debug(&app);
             Ok(())
         })
@@ -25,4 +28,9 @@ pub fn run() {
 fn debug(app: &tauri::App) {
     let window = app.get_webview_window("main").unwrap();
     window.open_devtools();
+}
+
+fn hide_dock_icon(app: &mut tauri::App) {
+    #[cfg(target_os = "macos")]
+    app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 }
