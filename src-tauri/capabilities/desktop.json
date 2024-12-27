@@ -5,6 +5,11 @@
   "permissions": [
     "global-shortcut:allow-is-registered",
     "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister"
+    "global-shortcut:allow-unregister",
+    "sql:allow-load",
+    "sql:default",
+    "sql:allow-execute",
+    "sql:allow-close",
+    "sql:allow-select"
   ]
 }

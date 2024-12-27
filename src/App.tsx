@@ -1,27 +1,31 @@
 import { useEffect, useState } from "react"
+import { readImage } from "@tauri-apps/plugin-clipboard-manager"
 
-import { initDatabase, getItems, addItem, type Item } from "./utils/db"
-import winAdjust from "./utils/winAdjust"
+import { getRecords, addRecord, type Record, RecordType } from "./utils/db"
 import styles from "./App.module.scss"
-import reactLogo from "./assets/react.svg"
 
 function App() {
-  const [items, setItems] = useState<Item[]>([])
+  const [records, setRecords] = useState<Record[]>([])
 
   useEffect(() => {
-    initDatabase().then(() => {
-      loadItems()
+    loadRecords()
+
+    readImage().then((image) => {
+      console.log(image)
     })
   }, [])
 
-  async function loadItems() {
-    const data = await getItems()
-    setItems(data)
+  async function loadRecords() {
+    const data = await getRecords()
+    setRecords(data)
   }
 
-  async function handleAddItem() {
-    await addItem("测试标题", "测试内容")
-    await loadItems()
+  async function handleAddTestRecord() {
+    await addRecord({
+      type: RecordType.Text,
+      value: "测试内容",
+    })
+    await loadRecords()
   }
 
   return (
@@ -30,31 +34,30 @@ function App() {
 
       <div className={styles.dbTest}>
         <h2>数据库测试</h2>
-        <button onClick={handleAddItem}>添加测试数据</button>
+        <button onClick={handleAddTestRecord}>添加测试数据</button>
 
         <div className={styles.itemList}>
-          {items.map((item) => (
-            <div key={item.id} className={styles.item}>
-              <h3>{item.title}</h3>
-              <p>{item.content}</p>
-              <small>{new Date(item.created_at).toLocaleString()}</small>
+          {records.map((record) => (
+            <div key={record.id} className={styles.item}>
+              <h3>{record.type}</h3>
+              <p>{record.value}</p>
+              {record.thumbnail && (
+                <img src={record.thumbnail} alt="thumbnail" />
+              )}
+              {record.size && <small>Size: {record.size}</small>}
+              {record.img_size && <small>Image size: {record.img_size}</small>}
+              <div>
+                <small>
+                  Created: {new Date(record.created_at).toLocaleString()}
+                </small>
+                <small>
+                  Updated: {new Date(record.updated_at).toLocaleString()}
+                </small>
+              </div>
             </div>
           ))}
         </div>
       </div>
-
-      <div className={styles.row}>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className={styles.logoVite} alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className={styles.logoTauri} alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className={styles.logoReact} alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
     </main>
   )
 }

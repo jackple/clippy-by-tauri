@@ -11,11 +11,13 @@ pub fn run() {
             utils::nspanel::toggle_panel,
             utils::nspanel::close_panel,
         ])
-        .setup(|app| {
-            utils::nspanel::init(&app);
-            utils::global_shortcut::register(&app);
+        .setup(|app: &mut tauri::App| {
             // 隐藏dock icon
             hide_dock_icon(app);
+
+            utils::nspanel::init(&app);
+            utils::global_shortcut::register(&app);
+            utils::clipboard::init(&app);
 
             // debug(&app);
             Ok(())
