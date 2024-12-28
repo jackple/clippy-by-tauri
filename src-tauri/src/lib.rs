@@ -5,21 +5,24 @@ mod utils;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_nspanel::init())
         .invoke_handler(tauri::generate_handler![
             utils::nspanel::toggle_panel,
             utils::nspanel::close_panel,
+            utils::db::add_record,
+            utils::db::get_records,
+            utils::db::delete_record,
         ])
         .setup(|app: &mut tauri::App| {
             // 隐藏dock icon
             hide_dock_icon(app);
 
+            utils::db::init(&app);
             utils::nspanel::init(&app);
             utils::global_shortcut::register(&app);
             utils::clipboard::init(&app);
 
-            // debug(&app);
+            debug(&app);
             Ok(())
         })
         .run(tauri::generate_context!())

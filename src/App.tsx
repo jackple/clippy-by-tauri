@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { readImage } from "@tauri-apps/plugin-clipboard-manager"
 
 import { getRecords, addRecord, type Record, RecordType } from "./utils/db"
 import styles from "./App.module.scss"
@@ -9,10 +8,6 @@ function App() {
 
   useEffect(() => {
     loadRecords()
-
-    readImage().then((image) => {
-      console.log(image)
-    })
   }, [])
 
   async function loadRecords() {
@@ -22,7 +17,7 @@ function App() {
 
   async function handleAddTestRecord() {
     await addRecord({
-      type: RecordType.Text,
+      record_type: RecordType.Text,
       value: "测试内容",
     })
     await loadRecords()
