@@ -7,6 +7,8 @@ use objc::{class, msg_send, sel, sel_impl};
 use std::time::Duration;
 use tauri::Manager;
 
+use crate::utils::nspanel::PANEL_STATE;
+
 pub fn init(app: &tauri::App) {
     // 每秒检查一次剪贴板变化
     std::thread::spawn(move || loop {
@@ -16,11 +18,14 @@ pub fn init(app: &tauri::App) {
 }
 
 pub fn check() {
+    println!(
+        "panel state: {:?}",
+        PANEL_STATE.lock().unwrap().is_visible()
+    );
+
     unsafe {
         let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
         let types: id = msg_send![pasteboard, types];
-
-        println!("types: {:?}", types);
 
         let mut file_path = None;
         let mut image_base64 = None;
@@ -29,7 +34,6 @@ pub fn check() {
         // 检查是否包含文件路径
         let file_url_type = NSString::alloc(nil).init_str("public.file-url");
         let contains_file_urls: bool = msg_send![types, containsObject: file_url_type];
-        println!("contains_file_urls: {:?}", contains_file_urls);
         if contains_file_urls {
             let item: *mut Object = msg_send![types, objectAtIndex: 0];
             let data: *mut Object = msg_send![pasteboard, dataForType: item];
@@ -70,9 +74,9 @@ pub fn check() {
             }
         }
 
-        println!("file_path: {:?}", file_path);
-        println!("image_base64: {:?}", image_base64.is_some());
-        println!("text_content: {:?}", text_content);
+        // println!("file_path: {:?}", file_path);
+        // println!("image_base64: {:?}", image_base64.is_some());
+        // println!("text_content: {:?}", text_content);
     }
 }
 
