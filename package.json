@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "NODE_OPTIONS='--max-http-header-size=128000' vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
