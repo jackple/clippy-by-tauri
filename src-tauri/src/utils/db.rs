@@ -124,21 +124,48 @@ pub async fn add_record(record: RecordInput) -> Result<i64, String> {
     Ok(db.conn.last_insert_rowid())
 }
 
+#[derive(Debug, Deserialize)]
+pub struct QueryParams {
+    pub page: u32,
+    pub keyword: Option<String>,
+}
+
 #[tauri::command]
-pub async fn get_records() -> Result<Vec<Record>, String> {
+pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
     let db = Database::get().map_err(|e| e.to_string())?;
     let db = db.as_ref().unwrap();
 
-    let mut stmt = db
-        .conn
-        .prepare(
-            "SELECT id, record_type, value, thumbnail, size, img_size, created_at, updated_at 
-             FROM record ORDER BY updated_at DESC",
+    let page_size = 30;
+    let offset = (params.page - 1) * page_size;
+
+    let base_query = "SELECT id, record_type, 
+             CASE 
+                WHEN record_type = 'image' THEN ''
+                ELSE value 
+             END as value,
+             thumbnail, size, img_size, created_at, updated_at 
+             FROM record";
+
+    let (query, params) = if let Some(keyword) = params.keyword {
+        (
+            format!("{} WHERE record_type IN ('text', 'file') AND value LIKE ?1 ORDER BY updated_at DESC LIMIT ?2 OFFSET ?3", base_query),
+            vec![
+                format!("%{}%", keyword),
+                page_size.to_string(),
+                offset.to_string(),
+            ],
         )
-        .map_err(|e| e.to_string())?;
+    } else {
+        (
+            format!("{} ORDER BY updated_at DESC LIMIT ?1 OFFSET ?2", base_query),
+            vec![page_size.to_string(), offset.to_string()],
+        )
+    };
+
+    let mut stmt = db.conn.prepare(query.as_str()).map_err(|e| e.to_string())?;
 
     let records = stmt
-        .query_map([], |row| {
+        .query_map(rusqlite::params_from_iter(params), |row| {
             Ok(Record {
                 id: row.get(0)?,
                 record_type: row.get(1)?,

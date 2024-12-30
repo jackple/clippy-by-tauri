@@ -11,7 +11,8 @@ function App() {
   }, [])
 
   async function loadRecords() {
-    const data = await getRecords()
+    const data = await getRecords({ page: 1 })
+    console.log("data", data)
     setRecords(data)
   }
 
@@ -34,7 +35,7 @@ function App() {
         <div className={styles.itemList}>
           {records.map((record) => (
             <div key={record.id} className={styles.item}>
-              <h3>{record.type}</h3>
+              <h3>{record.record_type}</h3>
               <p>{record.value}</p>
               {record.thumbnail && (
                 <img src={record.thumbnail} alt="thumbnail" />

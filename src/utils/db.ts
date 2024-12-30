@@ -24,8 +24,13 @@ export async function addRecord(
   return invoke("add_record", { record: params })
 }
 
-export async function getRecords(): Promise<Record[]> {
-  return invoke("get_records")
+interface QueryParams {
+  page: number
+  keyword?: string
+}
+
+export async function getRecords(params: QueryParams): Promise<Record[]> {
+  return invoke("get_records", { params })
 }
 
 export async function deleteRecord(id: number): Promise<void> {
