@@ -138,6 +138,7 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
     let page_size = 30;
     let offset = (params.page - 1) * page_size;
 
+    // 当type=image时, value是图片base64, 数据太大了, 置为空字符串(渲染时用thumbnail够了)
     let base_query = "SELECT id, record_type, 
              CASE 
                 WHEN record_type = 'image' THEN ''

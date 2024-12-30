@@ -1,36 +1,33 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
-import { getRecords, addRecord, type Record, RecordType } from "./utils/db"
+import { getRecords, type Record } from "./utils/db"
 import styles from "./App.module.scss"
 
 function App() {
   const [records, setRecords] = useState<Record[]>([])
 
-  useEffect(() => {
-    loadRecords()
+  const loadRecords = useCallback(async () => {
+    const data = await getRecords({ page: 1 })
+    setRecords(data)
   }, [])
 
-  async function loadRecords() {
-    const data = await getRecords({ page: 1 })
-    console.log("data", data)
-    setRecords(data)
-  }
+  useEffect(() => {
+    function handleFocus() {
+      console.log("handleFocus")
+      loadRecords()
+    }
 
-  async function handleAddTestRecord() {
-    await addRecord({
-      record_type: RecordType.Text,
-      value: "测试内容",
-    })
-    await loadRecords()
-  }
+    window.addEventListener("focus", handleFocus, false)
+
+    return () => {
+      window.removeEventListener("focus", handleFocus, false)
+    }
+  }, [loadRecords])
 
   return (
     <main className={styles.container}>
-      <h1>Welcome to Tauri + React</h1>
-
       <div className={styles.dbTest}>
-        <h2>数据库测试</h2>
-        <button onClick={handleAddTestRecord}>添加测试数据</button>
+        <h2>数据库测试 {records.length}</h2>
 
         <div className={styles.itemList}>
           {records.map((record) => (

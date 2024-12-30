@@ -7,10 +7,8 @@ use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
 use std::sync::Mutex;
 use std::time::Duration;
-use tauri::Manager;
 
 use crate::utils::db::{add_record, RecordInput};
-use crate::utils::nspanel::PANEL_STATE;
 use crate::utils::optimize_img::optimize_img;
 
 struct Record {
@@ -50,7 +48,7 @@ lazy_static! {
     });
 }
 
-pub fn init(app: &tauri::App) {
+pub fn init() {
     // 每秒检查一次剪贴板变化
     std::thread::spawn(move || {
         let runtime = tokio::runtime::Runtime::new().unwrap(); // 创建一个新的 Tokio 运行时
@@ -64,11 +62,6 @@ pub fn init(app: &tauri::App) {
 }
 
 pub async fn check() {
-    println!(
-        "panel state: {:?}",
-        PANEL_STATE.lock().unwrap().is_visible()
-    );
-
     unsafe {
         let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
         let types: id = msg_send![pasteboard, types];

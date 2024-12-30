@@ -18,6 +18,7 @@ impl PanelState {
         self.visible = false;
     }
 
+    #[allow(dead_code)]
     pub fn is_visible(&self) -> bool {
         self.visible
     }

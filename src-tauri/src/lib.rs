@@ -20,7 +20,7 @@ pub fn run() {
             utils::db::init(&app);
             utils::nspanel::init(&app);
             utils::global_shortcut::register(&app);
-            utils::clipboard::init(&app);
+            utils::clipboard::init();
 
             debug(&app);
             Ok(())
