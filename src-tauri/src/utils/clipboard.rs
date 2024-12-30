@@ -5,6 +5,7 @@ use cocoa::foundation::NSString;
 use lazy_static::lazy_static;
 use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
+use std::fs;
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -83,7 +84,17 @@ pub async fn check() {
             // 把它转换为标准化的路径
             if let Some(path) = resolve_file_url(&url_string) {
                 if LAST_RECORD.lock().unwrap().update("file", &path, None) {
-                    println!("file_path: {:?}", path);
+                    // 获取文件大小
+                    if let Ok(metadata) = fs::metadata(path.clone()) {
+                        let record = RecordInput {
+                            record_type: "file".to_string(),
+                            value: path,
+                            thumbnail: None,
+                            size: Some(metadata.len()),
+                            img_size: None,
+                        };
+                        add_record(record).await.unwrap();
+                    }
                 }
             }
             return;

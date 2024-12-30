@@ -69,7 +69,7 @@ pub struct RecordInput {
     pub record_type: String,
     pub value: String,
     pub thumbnail: Option<String>,
-    pub size: Option<i64>,
+    pub size: Option<u64>,
     pub img_size: Option<String>,
 }
 
