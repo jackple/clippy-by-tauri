@@ -127,6 +127,7 @@ pub async fn add_record(record: RecordInput) -> Result<i64, String> {
 #[derive(Debug, Deserialize)]
 pub struct QueryParams {
     pub page: u32,
+    pub page_size: u32,
     pub keyword: Option<String>,
 }
 
@@ -135,8 +136,7 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
     let db = Database::get().map_err(|e| e.to_string())?;
     let db = db.as_ref().unwrap();
 
-    let page_size = 30;
-    let offset = (params.page - 1) * page_size;
+    let offset = (params.page - 1) * params.page_size;
 
     // 当type=image时, value是图片base64, 数据太大了, 置为空字符串(渲染时用thumbnail够了)
     let base_query = "SELECT id, record_type, 
@@ -152,14 +152,14 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
             format!("{} WHERE record_type IN ('text', 'file') AND value LIKE ?1 ORDER BY updated_at DESC LIMIT ?2 OFFSET ?3", base_query),
             vec![
                 format!("%{}%", keyword),
-                page_size.to_string(),
+                params.page_size.to_string(),
                 offset.to_string(),
             ],
         )
     } else {
         (
             format!("{} ORDER BY updated_at DESC LIMIT ?1 OFFSET ?2", base_query),
-            vec![page_size.to_string(), offset.to_string()],
+            vec![params.page_size.to_string(), offset.to_string()],
         )
     };
 

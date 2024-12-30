@@ -7,7 +7,7 @@ function App() {
   const [records, setRecords] = useState<Record[]>([])
 
   const loadRecords = useCallback(async () => {
-    const data = await getRecords({ page: 1 })
+    const data = await getRecords({ page: 1, page_size: 30 })
     setRecords(data)
   }, [])
 
