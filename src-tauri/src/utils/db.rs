@@ -14,7 +14,9 @@ pub struct Record {
     record_type: String,
     value: String,
     thumbnail: Option<String>,
+    // 文件size, 单位bytes
     size: Option<i64>,
+    // 图片尺寸 款x高
     img_size: Option<String>,
     created_at: String,
     updated_at: String,
@@ -64,23 +66,51 @@ pub fn init(app: &tauri::App) {
 
 #[derive(Debug, Deserialize)]
 pub struct RecordInput {
-    record_type: String,
-    value: String,
-    thumbnail: Option<String>,
-    size: Option<i64>,
-    img_size: Option<String>,
+    pub record_type: String,
+    pub value: String,
+    pub thumbnail: Option<String>,
+    pub size: Option<i64>,
+    pub img_size: Option<String>,
+}
+
+// 通过 record_type 和 value 检查是否存在相同的记录
+pub fn check_record_exists(
+    conn: &Connection,
+    record_type: &str,
+    value: &str,
+) -> Result<Option<i64>, rusqlite::Error> {
+    let mut stmt = conn.prepare(
+        "SELECT id FROM record 
+         WHERE record_type = ?1 AND value = ?2 
+         ORDER BY updated_at DESC LIMIT 1",
+    )?;
+
+    Ok(stmt.query_row([record_type, value], |row| row.get(0)).ok())
 }
 
 #[tauri::command]
 pub async fn add_record(record: RecordInput) -> Result<i64, String> {
-    println!("add_record: {:?}", record);
     let db = Database::get().map_err(|e| e.to_string())?;
     let db = db.as_ref().unwrap();
 
+    let existing_id = check_record_exists(&db.conn, &record.record_type, &record.value)
+        .map_err(|e| e.to_string())?;
+
+    if let Some(id) = existing_id {
+        // 如果存在，更新时间戳
+        db.conn
+            .execute(
+                "UPDATE record SET updated_at = CURRENT_TIMESTAMP WHERE id = ?1",
+                [id],
+            )
+            .map_err(|e| e.to_string())?;
+        return Ok(id);
+    }
+    // 如果不存在，插入新记录
     db.conn
         .execute(
             "INSERT INTO record (record_type, value, thumbnail, size, img_size, updated_at) 
-             VALUES (?1, ?2, ?3, ?4, ?5, CURRENT_TIMESTAMP)",
+                 VALUES (?1, ?2, ?3, ?4, ?5, CURRENT_TIMESTAMP)",
             (
                 record.record_type,
                 record.value,

@@ -2,22 +2,68 @@ use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
+use lazy_static::lazy_static;
 use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
+use std::sync::Mutex;
 use std::time::Duration;
 use tauri::Manager;
 
+use crate::utils::db::{add_record, RecordInput};
 use crate::utils::nspanel::PANEL_STATE;
+use crate::utils::optimize_img::optimize_img;
 
-pub fn init(app: &tauri::App) {
-    // 每秒检查一次剪贴板变化
-    std::thread::spawn(move || loop {
-        check();
-        std::thread::sleep(Duration::from_millis(2500));
+struct Record {
+    record_type: Option<String>,
+    value: Option<String>,
+    img_bytes: Option<Vec<u8>>,
+}
+
+impl Record {
+    // 更新记录，如果记录没有变化，则返回 false
+    fn update(&mut self, record_type: &str, value: &str, img_bytes: Option<Vec<u8>>) -> bool {
+        let record_type = Some(record_type.to_string());
+        let value = Some(value.to_string());
+
+        if self.record_type == record_type && self.value == value {
+            return false;
+        }
+        self.record_type = record_type;
+        self.value = value;
+        self.img_bytes = img_bytes;
+        true
+    }
+
+    fn is_same_img(&self, img_bytes: &[u8]) -> bool {
+        if self.img_bytes.is_none() {
+            return false;
+        }
+        self.img_bytes.as_ref().unwrap() == img_bytes
+    }
+}
+
+lazy_static! {
+    static ref LAST_RECORD: Mutex<Record> = Mutex::new(Record {
+        record_type: None,
+        value: None,
+        img_bytes: None,
     });
 }
 
-pub fn check() {
+pub fn init(app: &tauri::App) {
+    // 每秒检查一次剪贴板变化
+    std::thread::spawn(move || {
+        let runtime = tokio::runtime::Runtime::new().unwrap(); // 创建一个新的 Tokio 运行时
+        runtime.block_on(async {
+            loop {
+                check().await; // 在异步上下文中调用
+                std::thread::sleep(Duration::from_millis(2500));
+            }
+        });
+    });
+}
+
+pub async fn check() {
     println!(
         "panel state: {:?}",
         PANEL_STATE.lock().unwrap().is_visible()
@@ -26,10 +72,6 @@ pub fn check() {
     unsafe {
         let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
         let types: id = msg_send![pasteboard, types];
-
-        let mut file_path = None;
-        let mut image_base64 = None;
-        let mut text_content = None;
 
         // 检查是否包含文件路径
         let file_url_type = NSString::alloc(nil).init_str("public.file-url");
@@ -47,8 +89,11 @@ pub fn check() {
             let url_string = nsstring_to_rust_string(nsstring);
             // 把它转换为标准化的路径
             if let Some(path) = resolve_file_url(&url_string) {
-                file_path = Some(path);
+                if LAST_RECORD.lock().unwrap().update("file", &path, None) {
+                    println!("file_path: {:?}", path);
+                }
             }
+            return;
         }
 
         // 检查是否包含图片
@@ -60,8 +105,25 @@ pub fn check() {
                 let length: usize = msg_send![data, length];
                 let bytes: *const u8 = msg_send![data, bytes];
                 let slice = std::slice::from_raw_parts(bytes, length);
-                image_base64 = Some(STANDARD.encode(slice));
+                let mut last_record = LAST_RECORD.lock().unwrap();
+                // 在encode前检测图片是不是同一张, 如果一样, encode没有意义
+                if last_record.is_same_img(&slice) {
+                    return;
+                }
+                let (thumbnail, img_size) = optimize_img(&slice).unwrap();
+                let img_base64 = STANDARD.encode(slice);
+                let _ = last_record.update("image", &img_base64, Some(slice.to_vec()));
+
+                let record = RecordInput {
+                    record_type: "image".to_string(),
+                    value: img_base64,
+                    thumbnail: Some(thumbnail),
+                    size: None,
+                    img_size: Some(img_size),
+                };
+                add_record(record).await.unwrap();
             }
+            return;
         }
 
         // 检查是否包含文字
@@ -70,13 +132,19 @@ pub fn check() {
         if contains_text {
             let string: id = msg_send![pasteboard, stringForType: text_type];
             if !string.is_null() {
-                text_content = Some(nsstring_to_rust_string(string));
+                let t = nsstring_to_rust_string(string);
+                if LAST_RECORD.lock().unwrap().update("text", &t, None) {
+                    let record = RecordInput {
+                        record_type: "text".to_string(),
+                        value: t,
+                        thumbnail: None,
+                        size: None,
+                        img_size: None,
+                    };
+                    add_record(record).await.unwrap();
+                }
             }
         }
-
-        // println!("file_path: {:?}", file_path);
-        // println!("image_base64: {:?}", image_base64.is_some());
-        // println!("text_content: {:?}", text_content);
     }
 }
 
