@@ -1,56 +1,55 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 
 import { getRecords, type Record } from "./utils/db"
+import { SearchInput } from "./components/SearchInput"
+import { RecordList, type RecordListRef } from "./components/RecordList"
 import styles from "./App.module.scss"
 
 function App() {
   const [records, setRecords] = useState<Record[]>([])
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [keyword, setKeyword] = useState("")
+  const listRef = useRef<RecordListRef>(null)
 
   const loadRecords = useCallback(async () => {
-    const data = await getRecords({ page: 1, page_size: 30 })
+    const data = await getRecords({ page: 1, page_size: 30, keyword })
     setRecords(data)
+    // 默认选中第一条记录
+    if (data.length > 0 && !selectedId) {
+      setSelectedId(data[0].id)
+    }
+  }, [selectedId, keyword])
+
+  const handleSearch = useCallback((value: string) => {
+    setKeyword(value)
+    setSelectedId(null) // 重置选中状态
   }, [])
 
   useEffect(() => {
     function handleFocus() {
-      console.log("handleFocus")
       loadRecords()
+      listRef.current?.focus()
     }
 
     window.addEventListener("focus", handleFocus, false)
-
     return () => {
       window.removeEventListener("focus", handleFocus, false)
     }
   }, [loadRecords])
 
+  const handleSelect = useCallback((record: Record) => {
+    setSelectedId(record.id)
+  }, [])
+
   return (
     <main className={styles.container}>
-      <div className={styles.dbTest}>
-        <h2>数据库测试 {records.length}</h2>
-
-        <div className={styles.itemList}>
-          {records.map((record) => (
-            <div key={record.id} className={styles.item}>
-              <h3>{record.record_type}</h3>
-              <p>{record.value}</p>
-              {record.thumbnail && (
-                <img src={record.thumbnail} alt="thumbnail" />
-              )}
-              {record.size && <small>Size: {record.size}</small>}
-              {record.img_size && <small>Image size: {record.img_size}</small>}
-              <div>
-                <small>
-                  Created: {new Date(record.created_at).toLocaleString()}
-                </small>
-                <small>
-                  Updated: {new Date(record.updated_at).toLocaleString()}
-                </small>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <SearchInput onSearch={handleSearch} />
+      <RecordList
+        ref={listRef}
+        records={records}
+        selectedId={selectedId}
+        onSelect={handleSelect}
+      />
     </main>
   )
 }
