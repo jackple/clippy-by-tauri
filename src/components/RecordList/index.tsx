@@ -51,6 +51,7 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
       switch (e.key) {
         case "ArrowLeft": {
           if (currentIndex > 0) {
+            e.preventDefault()
             const record = records[currentIndex - 1]
             onSelect(record, currentIndex - 1)
           }
@@ -58,6 +59,7 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
         }
         case "ArrowRight": {
           if (currentIndex < records.length - 1) {
+            e.preventDefault()
             const record = records[currentIndex + 1]
             onSelect(record, currentIndex + 1)
           }
