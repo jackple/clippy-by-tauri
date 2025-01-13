@@ -12,14 +12,6 @@ function App() {
   const [keyword, setKeyword] = useState("")
   const listRef = useRef<RecordListRef>(null)
 
-  const loadRecords = useCallback(async () => {
-    const data = await getRecords({ page: 1, page_size: 30, keyword })
-    setRecords(data)
-    if (data.length > 0) {
-      setSelectedId(data[0].id)
-    }
-  }, [keyword])
-
   const debouncedLoadRef = useRef(
     debounce(async (kw: string) => {
       const data = await getRecords({ page: 1, page_size: 30, keyword: kw })
@@ -27,7 +19,7 @@ function App() {
       if (data.length > 0) {
         setSelectedId(data[0].id)
       }
-    }, 300)
+    }, 200)
   )
 
   useEffect(() => {
@@ -38,6 +30,14 @@ function App() {
     setKeyword(value)
     setSelectedId(null) // 重置选中状态
   }, [])
+
+  const loadRecords = useCallback(async () => {
+    const data = await getRecords({ page: 1, page_size: 30, keyword })
+    setRecords(data)
+    if (data.length > 0 && !selectedId) {
+      setSelectedId(data[0].id)
+    }
+  }, [keyword])
 
   useEffect(() => {
     function handleFocus() {
