@@ -10,15 +10,21 @@ export function SearchInput({ onSearch }: Props) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") {
-        onSearch(value)
-      }
       // 阻止方向键事件冒泡，避免触发列表的左右滚动
       if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.stopPropagation()
       }
     },
-    [value, onSearch]
+    []
+  )
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value
+      setValue(newValue)
+      onSearch(newValue)
+    },
+    [onSearch]
   )
 
   const handleClear = useCallback(() => {
@@ -33,7 +39,7 @@ export function SearchInput({ onSearch }: Props) {
         <input
           type="text"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="搜索..."
           className={styles.searchInput}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react"
+import { debounce } from "lodash-es"
 
 import { getRecords, type Record } from "./utils/db"
 import { SearchInput } from "./components/SearchInput"
@@ -14,11 +15,24 @@ function App() {
   const loadRecords = useCallback(async () => {
     const data = await getRecords({ page: 1, page_size: 30, keyword })
     setRecords(data)
-    // 默认选中第一条记录
-    if (data.length > 0 && !selectedId) {
+    if (data.length > 0) {
       setSelectedId(data[0].id)
     }
-  }, [selectedId, keyword])
+  }, [keyword])
+
+  const debouncedLoadRef = useRef(
+    debounce(async (kw: string) => {
+      const data = await getRecords({ page: 1, page_size: 30, keyword: kw })
+      setRecords(data)
+      if (data.length > 0) {
+        setSelectedId(data[0].id)
+      }
+    }, 300)
+  )
+
+  useEffect(() => {
+    debouncedLoadRef.current(keyword)
+  }, [keyword])
 
   const handleSearch = useCallback((value: string) => {
     setKeyword(value)

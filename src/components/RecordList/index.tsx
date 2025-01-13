@@ -8,6 +8,7 @@ import {
 import classNames from "classnames"
 import { type Record } from "../../utils/db"
 import { RecordItem } from "../RecordItem"
+import { EmptyState } from "../EmptyState"
 import styles from "./styles.module.scss"
 
 interface Props {
@@ -100,20 +101,24 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
 
   return (
     <div ref={listRef} className={styles.recordList} tabIndex={-1}>
-      {records.map((record, index) => (
-        <div
-          key={record.id}
-          className={classNames(styles.recordItem, {
-            [styles.selected]: record.id === selectedId,
-          })}
-          onClick={() => handleItemClick(record, index)}
-        >
-          <RecordItem record={record} />
-          <div className={styles.recordMeta}>
-            <time>{new Date(record.updated_at).toLocaleString()}</time>
+      {records.length === 0 ? (
+        <EmptyState />
+      ) : (
+        records.map((record, index) => (
+          <div
+            key={record.id}
+            className={classNames(styles.recordItem, {
+              [styles.selected]: record.id === selectedId,
+            })}
+            onClick={() => handleItemClick(record, index)}
+          >
+            <RecordItem record={record} />
+            <div className={styles.recordMeta}>
+              <time>{new Date(record.updated_at).toLocaleString()}</time>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   )
 })
