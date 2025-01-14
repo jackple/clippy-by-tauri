@@ -10,12 +10,21 @@ function App() {
   const [records, setRecords] = useState<Record[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [keyword, setKeyword] = useState("")
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
   const listRef = useRef<RecordListRef>(null)
+  const PAGE_SIZE = 30
 
   const debouncedLoadRef = useRef(
     debounce(async (kw: string) => {
-      const data = await getRecords({ page: 1, page_size: 30, keyword: kw })
+      const data = await getRecords({
+        page: 1,
+        page_size: PAGE_SIZE,
+        keyword: kw,
+      })
       setRecords(data)
+      setPage(1)
+      setHasMore(data.length === PAGE_SIZE)
       if (data.length > 0) {
         setSelectedId(data[0].id)
       }
@@ -32,12 +41,29 @@ function App() {
   }, [])
 
   const loadRecords = useCallback(async () => {
-    const data = await getRecords({ page: 1, page_size: 30, keyword })
+    const data = await getRecords({ page: 1, page_size: PAGE_SIZE, keyword })
     setRecords(data)
+    setPage(1)
+    setHasMore(data.length === PAGE_SIZE)
     if (data.length > 0 && !selectedId) {
       setSelectedId(data[0].id)
     }
   }, [keyword])
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore) return
+
+    const nextPage = page + 1
+    const data = await getRecords({
+      page: nextPage,
+      page_size: PAGE_SIZE,
+      keyword,
+    })
+
+    setRecords((prev) => [...prev, ...data])
+    setPage(nextPage)
+    setHasMore(data.length === PAGE_SIZE)
+  }, [page, hasMore, keyword])
 
   useEffect(() => {
     function handleFocus() {
@@ -51,9 +77,12 @@ function App() {
     }
   }, [loadRecords])
 
-  const handleSelect = useCallback((record: Record) => {
-    setSelectedId(record.id)
-  }, [])
+  const handleSelect = useCallback(
+    (record: Record) => {
+      setSelectedId(record.id)
+    },
+    [records, loadMore]
+  )
 
   return (
     <main className={styles.container}>
@@ -63,6 +92,7 @@ function App() {
         records={records}
         selectedId={selectedId}
         onSelect={handleSelect}
+        onLoadMore={loadMore}
       />
     </main>
   )

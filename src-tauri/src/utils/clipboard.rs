@@ -56,7 +56,7 @@ pub fn init() {
         runtime.block_on(async {
             loop {
                 check().await; // 在异步上下文中调用
-                std::thread::sleep(Duration::from_millis(2500));
+                std::thread::sleep(Duration::from_millis(300));
             }
         });
     });

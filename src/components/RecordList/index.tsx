@@ -15,6 +15,7 @@ interface Props {
   records: Record[]
   selectedId: number | null
   onSelect: (record: Record, index: number) => void
+  onLoadMore?: () => void
 }
 
 export interface RecordListRef {
@@ -22,7 +23,7 @@ export interface RecordListRef {
 }
 
 export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
-  { records, selectedId, onSelect },
+  { records, selectedId, onSelect, onLoadMore },
   ref
 ) {
   const listRef = useRef<HTMLDivElement>(null)
@@ -98,6 +99,29 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
     },
     [onSelect]
   )
+
+  // 监听滚动事件
+  const handleScroll = useCallback(() => {
+    if (!listRef.current || !onLoadMore) return
+
+    const container = listRef.current
+    const scrollLeft = container.scrollLeft
+    const scrollWidth = container.scrollWidth
+    const clientWidth = container.clientWidth
+
+    // 当滚动到距离右边 20% 的位置时加载更多
+    if (scrollWidth - (scrollLeft + clientWidth) < clientWidth * 0.2) {
+      onLoadMore()
+    }
+  }, [onLoadMore])
+
+  useEffect(() => {
+    const container = listRef.current
+    if (!container) return
+
+    container.addEventListener("scroll", handleScroll)
+    return () => container.removeEventListener("scroll", handleScroll)
+  }, [handleScroll])
 
   return (
     <div ref={listRef} className={styles.recordList} tabIndex={-1}>
