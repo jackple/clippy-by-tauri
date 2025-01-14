@@ -8,10 +8,9 @@ pub fn run() {
         .plugin(tauri_nspanel::init())
         .invoke_handler(tauri::generate_handler![
             utils::nspanel::toggle_panel,
-            utils::nspanel::close_panel,
             utils::db::add_record,
             utils::db::get_records,
-            utils::db::delete_record,
+            utils::clipboard_write::choose,
         ])
         .setup(|app: &mut tauri::App| {
             // 隐藏dock icon
@@ -20,9 +19,9 @@ pub fn run() {
             utils::db::init(&app);
             utils::nspanel::init(&app);
             utils::global_shortcut::register(&app);
-            utils::clipboard::init();
+            utils::clipboard_read::init();
 
-            debug(&app);
+            // debug(&app);
             Ok(())
         })
         .run(tauri::generate_context!())

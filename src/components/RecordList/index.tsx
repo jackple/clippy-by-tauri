@@ -5,6 +5,7 @@ import {
   forwardRef,
   useEffect,
 } from "react"
+import { invoke } from "@tauri-apps/api/core"
 import classNames from "classnames"
 import { type Record } from "../../utils/db"
 import { RecordItem } from "../RecordItem"
@@ -67,6 +68,12 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
           }
           break
         }
+        case "Enter": {
+          if (currentIndex !== -1) {
+            choose(records[currentIndex])
+          }
+          break
+        }
       }
     },
     [records, selectedId, onSelect]
@@ -100,17 +107,23 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
     [onSelect]
   )
 
+  async function choose(record: Record) {
+    await invoke("choose", { record })
+    await invoke("toggle_panel")
+  }
+
   // 监听滚动事件
   const handleScroll = useCallback(() => {
     if (!listRef.current || !onLoadMore) return
 
     const container = listRef.current
-    const scrollLeft = container.scrollLeft
-    const scrollWidth = container.scrollWidth
     const clientWidth = container.clientWidth
 
     // 当滚动到距离右边 20% 的位置时加载更多
-    if (scrollWidth - (scrollLeft + clientWidth) < clientWidth * 0.2) {
+    if (
+      container.scrollWidth - (container.scrollLeft + clientWidth) <
+      clientWidth * 0.2
+    ) {
       onLoadMore()
     }
   }, [onLoadMore])

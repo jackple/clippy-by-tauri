@@ -149,8 +149,10 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
     let mut query_params = Vec::new();
 
     if let Some(keyword) = params.keyword {
-        conditions.push("record_type IN ('text', 'file') AND value LIKE ?");
-        query_params.push(format!("%{}%", keyword));
+        if !keyword.is_empty() {
+            conditions.push("record_type IN ('text', 'file') AND value LIKE ?");
+            query_params.push(format!("%{}%", keyword));
+        }
     }
 
     if let Some(last_updated_at) = params.last_updated_at {
@@ -193,12 +195,15 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
 }
 
 #[tauri::command]
-pub async fn delete_record(id: i64) -> Result<(), String> {
+pub async fn get_record_value(id: i64) -> Result<String, String> {
     let db = Database::get().map_err(|e| e.to_string())?;
     let db = db.as_ref().unwrap();
 
-    db.conn
-        .execute("DELETE FROM record WHERE id = ?1", [id])
+    let mut stmt = db
+        .conn
+        .prepare("SELECT value FROM record WHERE id = ?1")
         .map_err(|e| e.to_string())?;
-    Ok(())
+
+    stmt.query_row([id], |row| Ok(row.get(0)?))
+        .map_err(|e| e.to_string())
 }

@@ -105,10 +105,10 @@ pub fn toggle_panel(handle: AppHandle) {
     win.set_focus().unwrap();
 }
 
-#[tauri::command]
-pub fn close_panel(handle: AppHandle) {
-    let panel = handle.get_webview_panel("main").unwrap();
+// #[tauri::command]
+// pub fn close_panel(handle: AppHandle) {
+//     let panel = handle.get_webview_panel("main").unwrap();
 
-    panel.released_when_closed(true);
-    panel.close();
-}
+//     panel.released_when_closed(true);
+//     panel.close();
+// }
