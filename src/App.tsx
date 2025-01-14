@@ -6,25 +6,24 @@ import { SearchInput } from "./components/SearchInput"
 import { RecordList, type RecordListRef } from "./components/RecordList"
 import styles from "./App.module.scss"
 
+const DEFAULT_LIMIT = 30
+
 function App() {
   const [records, setRecords] = useState<Record[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [keyword, setKeyword] = useState("")
-  const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const listRef = useRef<RecordListRef>(null)
-  const PAGE_SIZE = 30
+  const pageLimit = useRef(DEFAULT_LIMIT)
 
   const debouncedLoadRef = useRef(
     debounce(async (kw: string) => {
       const data = await getRecords({
-        page: 1,
-        page_size: PAGE_SIZE,
+        limit: pageLimit.current,
         keyword: kw,
       })
       setRecords(data)
-      setPage(1)
-      setHasMore(data.length === PAGE_SIZE)
+      setHasMore(data.length === pageLimit.current)
       if (data.length > 0) {
         setSelectedId(data[0].id)
       }
@@ -41,29 +40,38 @@ function App() {
   }, [])
 
   const loadRecords = useCallback(async () => {
-    const data = await getRecords({ page: 1, page_size: PAGE_SIZE, keyword })
+    if (records.length > DEFAULT_LIMIT) {
+      pageLimit.current = records.length
+    }
+    const data = await getRecords({
+      limit: pageLimit.current,
+      keyword,
+    })
     setRecords(data)
-    setPage(1)
-    setHasMore(data.length === PAGE_SIZE)
+    setHasMore(data.length === pageLimit.current)
     if (data.length > 0 && !selectedId) {
       setSelectedId(data[0].id)
     }
-  }, [keyword])
+    if (pageLimit.current !== DEFAULT_LIMIT) {
+      pageLimit.current = DEFAULT_LIMIT
+    }
+  }, [keyword, records])
 
   const loadMore = useCallback(async () => {
     if (!hasMore) return
 
-    const nextPage = page + 1
+    const lastRecord = records[records.length - 1]
+    if (!lastRecord) return
+
     const data = await getRecords({
-      page: nextPage,
-      page_size: PAGE_SIZE,
+      last_id: lastRecord.id,
+      limit: pageLimit.current,
       keyword,
     })
 
     setRecords((prev) => [...prev, ...data])
-    setPage(nextPage)
-    setHasMore(data.length === PAGE_SIZE)
-  }, [page, hasMore, keyword])
+    setHasMore(data.length === pageLimit.current)
+  }, [hasMore, keyword, records])
 
   useEffect(() => {
     function handleFocus() {

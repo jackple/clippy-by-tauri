@@ -126,8 +126,8 @@ pub async fn add_record(record: RecordInput) -> Result<i64, String> {
 
 #[derive(Debug, Deserialize)]
 pub struct QueryParams {
-    pub page: u32,
-    pub page_size: u32,
+    pub last_id: Option<i64>,
+    pub limit: u32,
     pub keyword: Option<String>,
 }
 
@@ -135,8 +135,6 @@ pub struct QueryParams {
 pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
     let db = Database::get().map_err(|e| e.to_string())?;
     let db = db.as_ref().unwrap();
-
-    let offset = (params.page - 1) * params.page_size;
 
     // 当type=image时, value是图片base64, 数据太大了, 置为空字符串(渲染时用thumbnail够了)
     let base_query = "SELECT id, record_type, 
@@ -147,26 +145,35 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
              thumbnail, size, img_size, created_at, updated_at 
              FROM record";
 
-    let (query, params) = if let Some(keyword) = params.keyword {
-        (
-            format!("{} WHERE record_type IN ('text', 'file') AND value LIKE ?1 ORDER BY updated_at DESC LIMIT ?2 OFFSET ?3", base_query),
-            vec![
-                format!("%{}%", keyword),
-                params.page_size.to_string(),
-                offset.to_string(),
-            ],
-        )
+    let mut conditions = Vec::new();
+    let mut query_params = Vec::new();
+
+    if let Some(keyword) = params.keyword {
+        conditions.push("record_type IN ('text', 'file') AND value LIKE ?");
+        query_params.push(format!("%{}%", keyword));
+    }
+
+    if let Some(last_id) = params.last_id {
+        conditions.push("id < ?");
+        query_params.push(last_id.to_string());
+    }
+
+    let query = if conditions.is_empty() {
+        format!("{} ORDER BY id DESC LIMIT ?", base_query)
     } else {
-        (
-            format!("{} ORDER BY updated_at DESC LIMIT ?1 OFFSET ?2", base_query),
-            vec![params.page_size.to_string(), offset.to_string()],
+        format!(
+            "{} WHERE {} ORDER BY id DESC LIMIT ?",
+            base_query,
+            conditions.join(" AND ")
         )
     };
+
+    query_params.push(params.limit.to_string());
 
     let mut stmt = db.conn.prepare(query.as_str()).map_err(|e| e.to_string())?;
 
     let records = stmt
-        .query_map(rusqlite::params_from_iter(params), |row| {
+        .query_map(rusqlite::params_from_iter(query_params), |row| {
             Ok(Record {
                 id: row.get(0)?,
                 record_type: row.get(1)?,
