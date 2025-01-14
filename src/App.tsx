@@ -6,7 +6,7 @@ import { SearchInput } from "./components/SearchInput"
 import { RecordList, type RecordListRef } from "./components/RecordList"
 import styles from "./App.module.scss"
 
-const DEFAULT_LIMIT = 30
+const LIMIT = 30
 
 function App() {
   const [records, setRecords] = useState<Record[]>([])
@@ -14,16 +14,15 @@ function App() {
   const [keyword, setKeyword] = useState("")
   const [hasMore, setHasMore] = useState(true)
   const listRef = useRef<RecordListRef>(null)
-  const pageLimit = useRef(DEFAULT_LIMIT)
 
   const debouncedLoadRef = useRef(
     debounce(async (kw: string) => {
       const data = await getRecords({
-        limit: pageLimit.current,
+        limit: LIMIT,
         keyword: kw,
       })
       setRecords(data)
-      setHasMore(data.length === pageLimit.current)
+      setHasMore(data.length === LIMIT)
       if (data.length > 0) {
         setSelectedId(data[0].id)
       }
@@ -40,20 +39,23 @@ function App() {
   }, [])
 
   const loadRecords = useCallback(async () => {
-    if (records.length > DEFAULT_LIMIT) {
-      pageLimit.current = records.length
+    // 检查是否有新的记录, 如果有, 则重新请求并把第一个选中
+    if (records.length) {
+      const data0 = await getRecords({
+        limit: 1,
+        keyword,
+      })
+      if (data0[0]?.id === records[0].id) return
     }
+
     const data = await getRecords({
-      limit: pageLimit.current,
+      limit: LIMIT,
       keyword,
     })
     setRecords(data)
-    setHasMore(data.length === pageLimit.current)
-    if (data.length > 0 && !selectedId) {
+    setHasMore(data.length === LIMIT)
+    if (data.length) {
       setSelectedId(data[0].id)
-    }
-    if (pageLimit.current !== DEFAULT_LIMIT) {
-      pageLimit.current = DEFAULT_LIMIT
     }
   }, [keyword, records])
 
@@ -65,12 +67,12 @@ function App() {
 
     const data = await getRecords({
       last_updated_at: lastRecord.updated_at,
-      limit: pageLimit.current,
+      limit: LIMIT,
       keyword,
     })
 
     setRecords((prev) => [...prev, ...data])
-    setHasMore(data.length === pageLimit.current)
+    setHasMore(data.length === LIMIT)
   }, [hasMore, keyword, records])
 
   useEffect(() => {
