@@ -126,7 +126,7 @@ pub async fn add_record(record: RecordInput) -> Result<i64, String> {
 
 #[derive(Debug, Deserialize)]
 pub struct QueryParams {
-    pub last_id: Option<i64>,
+    pub last_updated_at: Option<String>,
     pub limit: u32,
     pub keyword: Option<String>,
 }
@@ -153,16 +153,16 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
         query_params.push(format!("%{}%", keyword));
     }
 
-    if let Some(last_id) = params.last_id {
-        conditions.push("id < ?");
-        query_params.push(last_id.to_string());
+    if let Some(last_updated_at) = params.last_updated_at {
+        conditions.push("updated_at < ?");
+        query_params.push(last_updated_at);
     }
 
     let query = if conditions.is_empty() {
-        format!("{} ORDER BY id DESC LIMIT ?", base_query)
+        format!("{} ORDER BY updated_at DESC LIMIT ?", base_query)
     } else {
         format!(
-            "{} WHERE {} ORDER BY id DESC LIMIT ?",
+            "{} WHERE {} ORDER BY updated_at DESC LIMIT ?",
             base_query,
             conditions.join(" AND ")
         )

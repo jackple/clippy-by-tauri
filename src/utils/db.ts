@@ -25,7 +25,7 @@ export async function addRecord(
 }
 
 interface QueryParams {
-  last_id?: number
+  last_updated_at?: string
   limit: number
   keyword?: string
 }

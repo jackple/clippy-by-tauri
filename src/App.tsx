@@ -64,7 +64,7 @@ function App() {
     if (!lastRecord) return
 
     const data = await getRecords({
-      last_id: lastRecord.id,
+      last_updated_at: lastRecord.updated_at,
       limit: pageLimit.current,
       keyword,
     })
