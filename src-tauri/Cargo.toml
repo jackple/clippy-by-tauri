@@ -34,6 +34,7 @@ rusqlite = "0.32.1"
 image = "0.25.5"
 imagequant = "4.3.3"
 lodepng = "3.10.7"
+tauri-plugin-notification = "2"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-global-shortcut = "2"

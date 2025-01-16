@@ -87,12 +87,9 @@ function App() {
     }
   }, [loadRecords])
 
-  const handleSelect = useCallback(
-    (record: Record) => {
-      setSelectedId(record.id)
-    },
-    [records, loadMore]
-  )
+  const handleSelect = useCallback((record: Record) => {
+    setSelectedId(record.id)
+  }, [])
 
   return (
     <main className={styles.container}>

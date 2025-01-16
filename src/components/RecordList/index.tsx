@@ -7,6 +7,8 @@ import {
 } from "react"
 import { invoke } from "@tauri-apps/api/core"
 import classNames from "classnames"
+import { debounce } from "lodash-es"
+
 import { type Record } from "../../utils/db"
 import { RecordItem } from "../RecordItem"
 import { EmptyState } from "../EmptyState"
@@ -16,7 +18,7 @@ interface Props {
   records: Record[]
   selectedId: number | null
   onSelect: (record: Record, index: number) => void
-  onLoadMore?: () => void
+  onLoadMore: () => void
 }
 
 export interface RecordListRef {
@@ -113,20 +115,23 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
   }
 
   // 监听滚动事件
-  const handleScroll = useCallback(() => {
-    if (!listRef.current || !onLoadMore) return
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (!listRef.current) return
 
-    const container = listRef.current
-    const clientWidth = container.clientWidth
+      const container = listRef.current
+      const clientWidth = container.clientWidth
 
-    // 当滚动到距离右边 20% 的位置时加载更多
-    if (
-      container.scrollWidth - (container.scrollLeft + clientWidth) <
-      clientWidth * 0.2
-    ) {
-      onLoadMore()
-    }
-  }, [onLoadMore])
+      // 当滚动到距离右边 50% 的位置时加载更多
+      if (
+        container.scrollWidth - (container.scrollLeft + clientWidth) <
+        clientWidth * 0.5
+      ) {
+        onLoadMore()
+      }
+    }, 200),
+    [onLoadMore]
+  )
 
   useEffect(() => {
     const container = listRef.current

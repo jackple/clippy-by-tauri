@@ -5,7 +5,6 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{class, msg_send, sel, sel_impl};
 use serde::Deserialize;
-use std::fs;
 use std::path::Path;
 use std::process::Command;
 
@@ -51,13 +50,6 @@ pub fn write_image(base64_str: String) -> Result<(), String> {
 
 pub fn write_file(file_path: String) -> Result<(), String> {
     // 检查文件是否存在
-    if !fs::metadata(&file_path)
-        .map_err(|e| e.to_string())?
-        .is_file()
-    {
-        return Err("File not found".to_string());
-    }
-
     let path = Path::new(&file_path);
     if !path.exists() {
         return Err("File not found".to_string());
