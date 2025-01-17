@@ -50,8 +50,8 @@ pub fn init(app: &tauri::App) {
             }
             "window_did_resign_key" => {
                 println!("[info]: panel resigned from key window!");
-                // panel_ref.order_out(None);
-                // PANEL_STATE.lock().unwrap().hide();
+                panel_ref.order_out(None);
+                PANEL_STATE.lock().unwrap().hide();
             }
             _ => (),
         }
