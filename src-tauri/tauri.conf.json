@@ -42,6 +42,15 @@
       "exceptionDomain": "",
       "entitlements": "entitlements.plist",
       "providerShortName": null
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEYxNDA2MjIwQ0VGMzNCNkUKUldSdU8vUE9JR0pBOFo4S1FFenE0akhFS1J6dnF4NWlHMGdRSkU5TE04OUZQUlp1WVJ6bFM3eW0K",
+      "endpoints": [
+        "https://github.com/user/repo/releases/latest/download/latest.json"
+      ]
     }
   }
 }

@@ -13,6 +13,7 @@
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-global-shortcut": "^2.2.0",
     "@tauri-apps/plugin-opener": "^2.2.4",
+    "@tauri-apps/plugin-updater": "~2",
     "classnames": "^2.5.1",
     "lodash-es": "^4.17.21",
     "react": "^18.3.1",
