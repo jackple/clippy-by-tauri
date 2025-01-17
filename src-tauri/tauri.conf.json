@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "clippy",
+  "productName": "clippy2",
   "version": "0.1.0",
-  "identifier": "com.yidejia.clippy",
+  "identifier": "com.yidejia.clippy2",
   "build": {
     "beforeDevCommand": "yarn dev",
     "devUrl": "http://localhost:1420",
@@ -21,7 +21,10 @@
         "x": 0,
         "y": -100000
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    }
   },
   "bundle": {
     "active": true,
@@ -32,6 +35,13 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "",
+      "entitlements": "entitlements.plist",
+      "providerShortName": null
+    }
   }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "clippy"
+name = "clippy2"
 version = "0.1.0"
 description = "剪贴板管理工具"
 authors = ["jackple"]
@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["devtools"] }
 lazy_static = "1.5.0"
 tokio = "1.42.0"
 cocoa = "0.26.0"

@@ -5,3 +5,17 @@ This template should help get you started developing with Tauri, React and Types
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+
+# 构建 icon
+
+前提是当前目录下有`app-icon.png`文件
+
+```sh
+yarn tauri icon
+```
+
+# 构建 mac universal 包
+
+```sh
+yarn tauri build --target universal-apple-darwin
+```
