@@ -1,6 +1,7 @@
 import textIcon from "../../assets/text.png"
 import picIcon from "../../assets/pic.png"
 import fileIcon from "../../assets/file.png"
+import colorIcon from "../../assets/color.png"
 import { type Record } from "../../utils/db"
 import styles from "./styles.module.scss"
 
@@ -9,7 +10,47 @@ interface Props {
 }
 
 export function RecordItem({ record }: Props) {
+  const getColorValue = (hex: string) => {
+    // 如果以#开头，移除#
+    let colorValue = hex.startsWith("#") ? hex.substring(1) : hex
+    // 如果是3位颜色值，转换为6位
+    if (colorValue.length === 3) {
+      colorValue = colorValue
+        .split("")
+        .map((char) => char + char)
+        .join("")
+    }
+    return `#${colorValue}`
+  }
+
+  const isColorValue = (value: string) => {
+    // 如果以#开头，移除#
+    const colorValue = value.startsWith("#") ? value.substring(1) : value
+    // 判断是否是3位或6位16进制颜色值
+    return /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(colorValue)
+  }
+
+  const getInvertColor = (hex: string) => {
+    // 确保有#号
+    const colorValue = getColorValue(hex)
+    // 移除#号
+    const color = colorValue.substring(1)
+    // 转换为RGB
+    const r = parseInt(color.substring(0, 2), 16)
+    const g = parseInt(color.substring(2, 4), 16)
+    const b = parseInt(color.substring(4, 6), 16)
+    // 计算反色
+    const rInvert = (255 - r).toString(16).padStart(2, "0")
+    const gInvert = (255 - g).toString(16).padStart(2, "0")
+    const bInvert = (255 - b).toString(16).padStart(2, "0")
+    // 返回反色的十六进制值
+    return `#${rInvert}${gInvert}${bInvert}`
+  }
+
   const getTitle = () => {
+    if (record.record_type === "text" && isColorValue(record.value)) {
+      return "颜色"
+    }
     switch (record.record_type) {
       case "text":
         return "文本"
@@ -21,6 +62,9 @@ export function RecordItem({ record }: Props) {
   }
 
   const getIcon = () => {
+    if (record.record_type === "text" && isColorValue(record.value)) {
+      return colorIcon
+    }
     switch (record.record_type) {
       case "text":
         return textIcon
@@ -50,8 +94,13 @@ export function RecordItem({ record }: Props) {
     return `${Math.floor(diff / (24 * 60 * 60 * 1000))}天前`
   }
 
+  const isColor = record.record_type === "text" && isColorValue(record.value)
+
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      style={isColor ? { background: getColorValue(record.value) } : undefined}
+    >
       <div className={styles.header}>
         <div className={styles.title}>
           <span>{getTitle()}</span>
@@ -66,20 +115,38 @@ export function RecordItem({ record }: Props) {
             alt="thumbnail"
           />
         ) : (
-          <div className={styles.text}>{record.value}</div>
+          <div
+            className={styles.text}
+            style={
+              isColor
+                ? {
+                    color: getInvertColor(record.value),
+                    fontSize: 24,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                  }
+                : undefined
+            }
+          >
+            {record.value}
+          </div>
         )}
       </div>
-      <div className={styles.meta}>
-        {record.record_type === "text" && (
-          <span>{record.value.length}个字符</span>
-        )}
-        {record.record_type === "file" && record.size && (
-          <span>{formatSize(record.size)}</span>
-        )}
-        {record.record_type === "image" && record.img_size && (
-          <span>{record.img_size}</span>
-        )}
-      </div>
+      {!isColor && (
+        <div className={styles.meta}>
+          {record.record_type === "text" && (
+            <span>{record.value.length}个字符</span>
+          )}
+          {record.record_type === "file" && record.size && (
+            <span>{formatSize(record.size)}</span>
+          )}
+          {record.record_type === "image" && record.img_size && (
+            <span>{record.img_size}</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
