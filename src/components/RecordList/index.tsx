@@ -16,6 +16,7 @@ import styles from "./styles.module.scss"
 
 interface Props {
   records: Record[]
+  setRecords: React.Dispatch<React.SetStateAction<Record[]>>
   selectedId: number | null
   onSelect: (record: Record, index: number) => void
   onLoadMore: () => void
@@ -26,7 +27,7 @@ export interface RecordListRef {
 }
 
 export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
-  { records, selectedId, onSelect, onLoadMore },
+  { records, setRecords, selectedId, onSelect, onLoadMore },
   ref
 ) {
   const listRef = useRef<HTMLDivElement>(null)
@@ -130,7 +131,17 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
   }))
 
   async function choose(record: Record) {
-    await invoke("choose", { record })
+    await invoke("choose", { record }).catch((e) => {
+      if (e === "File not found") {
+        setRecords((rs) => {
+          const index = rs.findIndex((r) => r.id === record.id)
+          if (index === -1) return rs
+          rs[index] = { ...rs[index], is_deleted: true }
+          return [...rs]
+        })
+      }
+      throw e
+    })
     await invoke("toggle_panel")
   }
 
@@ -171,6 +182,7 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
             key={record.id}
             className={classNames(styles.recordItem, {
               [styles.selected]: selectedId === record.id,
+              [styles.deleted]: record.is_deleted,
             })}
             onClick={() => handleClick(record, index)}
             onDoubleClick={() => handleDoubleClick(record)}

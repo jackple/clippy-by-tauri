@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["devtools"] }
+tauri = { version = "2.2.2", features = ["devtools"] }
 lazy_static = "1.5.0"
 tokio = "1.42.0"
 cocoa = "0.26.0"
@@ -34,7 +34,6 @@ rusqlite = "0.32.1"
 image = "0.25.5"
 imagequant = "4.3.3"
 lodepng = "3.10.7"
-tauri-plugin-notification = "2"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-global-shortcut = "2"

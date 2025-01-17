@@ -491,24 +491,10 @@
     "@tauri-apps/cli-win32-ia32-msvc" "2.2.4"
     "@tauri-apps/cli-win32-x64-msvc" "2.2.4"
 
-"@tauri-apps/plugin-dialog@~2":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-dialog/-/plugin-dialog-2.2.0.tgz#2f7b841a982820adbc9c182e0e95acd8d90aa6fc"
-  integrity sha512-6bLkYK68zyK31418AK5fNccCdVuRnNpbxquCl8IqgFByOgWFivbiIlvb79wpSXi0O+8k8RCSsIpOquebusRVSg==
-  dependencies:
-    "@tauri-apps/api" "^2.0.0"
-
 "@tauri-apps/plugin-global-shortcut@^2.2.0":
   version "2.2.0"
   resolved "https://registry.npmmirror.com/@tauri-apps/plugin-global-shortcut/-/plugin-global-shortcut-2.2.0.tgz#5ab12218ab2d1863ff1aa823aed72daed7cded85"
   integrity sha512-clI9Bg/BcxWXNDK+ij601o1qC2WxMEy8ovhGgEW5Ai17oPy0KK8uwzmc59KiVnOYKpBWHCUPqBxG+KBNUFXgzw==
-  dependencies:
-    "@tauri-apps/api" "^2.0.0"
-
-"@tauri-apps/plugin-notification@~2":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-notification/-/plugin-notification-2.2.1.tgz#7e42af4f7a1f260cebf92fdfc2262d5132d93705"
-  integrity sha512-QF8Zod6XDhxD6xkD5nU/BjbOpJ6+3gxGCrVULOdLpvMuMSN2Z2IdObV/qgnrEJk1UamUCF1ClQUqNCbk4zTJNQ==
   dependencies:
     "@tauri-apps/api" "^2.0.0"
 

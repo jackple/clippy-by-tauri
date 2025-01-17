@@ -97,6 +97,7 @@ function App() {
       <RecordList
         ref={listRef}
         records={records}
+        setRecords={setRecords}
         selectedId={selectedId}
         onSelect={handleSelect}
         onLoadMore={loadMore}

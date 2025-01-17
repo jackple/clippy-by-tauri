@@ -38,4 +38,8 @@
     background-color: rgba(36, 200, 219, 0.05);
     box-shadow: 0 2px 12px rgba(36, 200, 219, 0.25);
   }
+
+  &.deleted {
+    border: 2px solid #ff4d4f;
+  }
 }

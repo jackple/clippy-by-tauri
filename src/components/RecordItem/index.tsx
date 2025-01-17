@@ -109,6 +109,9 @@ export function RecordItem({ record }: Props) {
         <div className={styles.time}>{getTime()}</div>
       </div>
       <div className={styles.content}>
+        {!!record.is_deleted && (
+          <div className={styles.error}>文件已不存在</div>
+        )}
         {record.record_type === "image" ? (
           <img
             src={`data:image/png;base64,${record.thumbnail}`}
