@@ -30,6 +30,33 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
   ref
 ) {
   const listRef = useRef<HTMLDivElement>(null)
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleClick: (record: Record, index: number) => void = (
+    record,
+    index
+  ) => {
+    if (clickTimer.current) {
+      // 如果已经有计时器，说明是双击，清除计时器并返回
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+      return
+    }
+
+    // 设置计时器，延迟执行单击事件
+    clickTimer.current = setTimeout(() => {
+      onSelect(record, index)
+      clickTimer.current = null
+    }, 150) // 150ms 的延迟，在响应速度和双击检测之间取得平衡
+  }
+
+  const handleDoubleClick = (record: Record) => {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+    }
+    choose(record)
+  }
 
   // 滚动选中的项目到合适位置
   const scrollSelectedIntoView = useCallback((index: number) => {
@@ -145,7 +172,8 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
             className={classNames(styles.recordItem, {
               [styles.selected]: selectedId === record.id,
             })}
-            onClick={() => onSelect(record, index)}
+            onClick={() => handleClick(record, index)}
+            onDoubleClick={() => handleDoubleClick(record)}
           >
             <RecordItem record={record} />
           </div>

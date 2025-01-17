@@ -77,7 +77,7 @@ export function RecordItem({ record }: Props) {
 
   const getTime = () => {
     const now = new Date()
-    const recordTime = new Date(record.created_at)
+    const recordTime = new Date(record.updated_at)
     recordTime.setHours(recordTime.getHours() + 8)
 
     const diff = now.getTime() - recordTime.getTime()
