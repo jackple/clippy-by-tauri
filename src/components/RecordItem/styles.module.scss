@@ -1,89 +1,65 @@
-.fileItem {
+.container {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  background: #fff;
+  height: 100%;
   min-height: 0;
-  flex: 1;
-  width: 100%;
+  padding-bottom: 8px;
+}
 
-  .fileIcon {
-    width: 24px;
-    height: 24px;
-    background: #eee;
-    border-radius: 4px;
-    flex-shrink: 0;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #5ccfcf;
+  color: #fff;
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
   }
 
-  .fileInfo {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .filePath {
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      word-break: break-all;
-    }
-
-    small {
-      color: #666;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  .time {
+    font-size: 14px;
   }
 }
 
-.imageItem {
+.content {
   flex: 1;
+  min-height: 0;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  width: 100%;
 
   img {
-    max-width: 100%;
-    max-height: 160px;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
     object-fit: contain;
     border-radius: 4px;
   }
-
-  small {
-    display: block;
-    margin-top: 0.5rem;
-    color: #666;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 
-.textItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  width: 100%;
+.text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 6;
+  -webkit-line-clamp: 6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  word-wrap: break-word;
+}
 
-  .textContent {
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    line-clamp: 10;
-    -webkit-line-clamp: 10;
-    -webkit-box-orient: vertical;
-    white-space: normal;
-    line-height: 1.5;
-    word-break: break-all;
-    word-wrap: break-word;
-  }
+.meta {
+  margin-top: auto;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
 }

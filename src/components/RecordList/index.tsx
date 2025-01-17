@@ -102,13 +102,6 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
     },
   }))
 
-  const handleItemClick = useCallback(
-    (record: Record, index: number) => {
-      onSelect(record, index)
-    },
-    [onSelect]
-  )
-
   async function choose(record: Record) {
     await invoke("choose", { record })
     await invoke("toggle_panel")
@@ -150,14 +143,11 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
           <div
             key={record.id}
             className={classNames(styles.recordItem, {
-              [styles.selected]: record.id === selectedId,
+              [styles.selected]: selectedId === record.id,
             })}
-            onClick={() => handleItemClick(record, index)}
+            onClick={() => onSelect(record, index)}
           >
             <RecordItem record={record} />
-            <div className={styles.recordMeta}>
-              <time>{new Date(record.updated_at).toLocaleString()}</time>
-            </div>
           </div>
         ))
       )}
