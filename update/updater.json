@@ -1,15 +1,15 @@
 {
   "version": "0.1.0",
   "notes": "交互优化",
-  "pub_date": "2025-01-18T08:29:13Z",
+  "pub_date": "2025-01-18T08:38:22Z",
   "platforms": {
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFRjSWNFU2c5Tjh3QlloNzJxT3FCdlNQTHlzVU1TdUloNEJmV3NvWVFxQWpaSjVUTm0wN0dDa0pqOXRLOU5ib0VPVEVkbkNFMkNmOWozN0FHNDBtbVFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3MTg3MTI3CWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6CmFrV2Z5U1A2RjJEWVR0cTZhd2FWWHBHOEFuRmRaaWNDT2RIUHlaWnorNlJRbmVuZ0t5cTlOY05aeXdMSkNjdS9XU3lLWGFYRFZtY3FQREVPVDZ0SUFRPT0K",
-      "url": "https://github.com/username/reponame/releases/download/v1.0.0/app-x86_64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFFzZWc2c0JrTERvVHpWWjhQdG5Bejh2ZWl4dENPWW52Si80VXNkejlHZm9uSHZ4OEpkdDZVZnBIek9uMkxWUTRZdzl3YTVjNDUrcTBJSjNhV0hxbkFjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3MTg5MjkyCWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6ClBLM1B0YlNQaUx4Y05NWi9ac3dYVzJGT3kvSTdtTTY0cFBTb0lrU1dvV2tiVW9kWjd2aU5FSTY1U2ttdjlEc3dpcGVyd0I1QUdrelB1VG5sU2J6bkFRPT0K",
+      "url": "https://desktop.yidejia.com/clippy2/clippy2.app.tar.gz"
     },
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFRjSWNFU2c5Tjh3QlloNzJxT3FCdlNQTHlzVU1TdUloNEJmV3NvWVFxQWpaSjVUTm0wN0dDa0pqOXRLOU5ib0VPVEVkbkNFMkNmOWozN0FHNDBtbVFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3MTg3MTI3CWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6CmFrV2Z5U1A2RjJEWVR0cTZhd2FWWHBHOEFuRmRaaWNDT2RIUHlaWnorNlJRbmVuZ0t5cTlOY05aeXdMSkNjdS9XU3lLWGFYRFZtY3FQREVPVDZ0SUFRPT0K",
-      "url": "https://github.com/username/reponame/releases/download/v1.0.0/app-aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFFzZWc2c0JrTERvVHpWWjhQdG5Bejh2ZWl4dENPWW52Si80VXNkejlHZm9uSHZ4OEpkdDZVZnBIek9uMkxWUTRZdzl3YTVjNDUrcTBJSjNhV0hxbkFjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3MTg5MjkyCWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6ClBLM1B0YlNQaUx4Y05NWi9ac3dYVzJGT3kvSTdtTTY0cFBTb0lrU1dvV2tiVW9kWjd2aU5FSTY1U2ttdjlEc3dpcGVyd0I1QUdrelB1VG5sU2J6bkFRPT0K",
+      "url": "https://desktop.yidejia.com/clippy2/clippy2.app.tar.gz"
     }
   }
 }

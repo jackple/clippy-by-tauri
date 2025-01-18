@@ -16,5 +16,5 @@ tool=./update/ossutilmac64
 
 $tool cp -r -u src-tauri/target/universal-apple-darwin/release/bundle/dmg/ oss://yim-sft-download/clippy2/ --config-file ~/.yim.ossutilconfig --include *.dmg
 $tool cp -r -u src-tauri/target/universal-apple-darwin/release/bundle/macos/clippy2.app.tar.gz oss://yim-sft-download/clippy2/ --config-file ~/.yim.ossutilconfig
-# $tool cp -r -u update/updater.json  oss://yim-sft-download/clippy2 --config-file ~/.yim.ossutilconfig
+$tool cp -r -u update/updater.json  oss://yim-sft-download/clippy2/ --config-file ~/.yim.ossutilconfig
 
