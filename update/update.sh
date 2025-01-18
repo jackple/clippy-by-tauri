@@ -5,8 +5,8 @@ version=$(node -pe "require('./package.json').version")
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$version\"/" update/updater.json
 
 # 把当前时间按照RFC 3339格式写到updater.json的pub_date字段
-pub_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-sed -i '' "s/\"pub_date\": \".*\"/\"pub_date\": \"$pub_date\"/" update/updater.json
+# pub_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+# sed -i '' "s/\"pub_date\": \".*\"/\"pub_date\": \"$pub_date\"/" update/updater.json
 
 # 把sig内容写到updater.json的signature字段
 sig=$(cat src-tauri/target/universal-apple-darwin/release/bundle/macos/clippy2.app.tar.gz.sig)
