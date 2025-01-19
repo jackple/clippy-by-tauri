@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useRef } from "react"
 import { debounce } from "lodash-es"
+import { invoke } from "@tauri-apps/api/core"
 
 import { getRecords, type Record } from "./utils/db"
 import { SearchInput } from "./components/SearchInput"
@@ -89,6 +90,17 @@ function App() {
 
   const handleSelect = useCallback((record: Record) => {
     setSelectedId(record.id)
+  }, [])
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        invoke("toggle_panel")
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
 
   return (
