@@ -36,7 +36,7 @@ function Updater() {
 
   useEffect(() => {
     checkForUpdate()
-    timerRef.current = setInterval(checkForUpdate, 10 * 60 * 1000)
+    timerRef.current = setInterval(checkForUpdate, 5 * 60 * 1000)
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
