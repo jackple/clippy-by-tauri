@@ -30,6 +30,7 @@ pub fn init(app: &tauri::App) {
                 println!("menu item {:?} not handled", event.id);
             }
         })
+        .tooltip("Cmd+Shift+V 打开")
         .build(app)
         .unwrap();
 }
