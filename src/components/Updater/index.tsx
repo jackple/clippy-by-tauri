@@ -48,7 +48,7 @@ function Updater() {
 
   return (
     <div className={styles.updater}>
-      <span>最新更新已安装完成!</span>
+      <span>最新版本已安装完成!</span>
       <button onClick={relaunch}>立即重启</button>
     </div>
   )
