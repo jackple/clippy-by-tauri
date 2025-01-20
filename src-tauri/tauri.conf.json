@@ -10,14 +10,12 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
         "title": "clippy",
         "visible": false,
         "decorations": false,
-        "transparent": true,
         "height": 322,
         "x": 0,
         "y": -100000
