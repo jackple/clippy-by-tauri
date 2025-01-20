@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core"
 import { getRecords, type Record } from "./utils/db"
 import { SearchInput } from "./components/SearchInput"
 import { RecordList, type RecordListRef } from "./components/RecordList"
+import Updater from "./components/Updater"
 import styles from "./App.module.scss"
 
 const LIMIT = 30
@@ -105,6 +106,7 @@ function App() {
 
   return (
     <main className={styles.container}>
+      <Updater />
       <SearchInput onSearch={handleSearch} />
       <RecordList
         ref={listRef}
