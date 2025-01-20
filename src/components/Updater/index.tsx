@@ -9,7 +9,9 @@ function Updater() {
   const isPending = useRef(false)
 
   const checkForUpdate = useCallback(async () => {
+    if (!navigator.onLine) return
     if (isPending.current) return
+
     isPending.current = true
     try {
       const update = await check({
