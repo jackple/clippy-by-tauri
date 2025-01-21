@@ -10,18 +10,20 @@ use std::process::Command;
 
 fn write_text(text: String) -> Result<(), String> {
     unsafe {
-        let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
-        let _: () = msg_send![pasteboard, clearContents];
+        objc::rc::autoreleasepool(|| {
+            let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
+            let _: () = msg_send![pasteboard, clearContents];
 
-        let text_type = NSString::alloc(nil).init_str("public.utf8-plain-text");
-        let nsstring = NSString::alloc(nil).init_str(&text);
-        let success: bool = msg_send![pasteboard, setString:nsstring forType:text_type];
+            let text_type = NSString::alloc(nil).init_str("public.utf8-plain-text");
+            let nsstring = NSString::alloc(nil).init_str(&text);
+            let success: bool = msg_send![pasteboard, setString:nsstring forType:text_type];
 
-        if success {
-            Ok(())
-        } else {
-            Err("Failed to write text to clipboard".to_string())
-        }
+            if success {
+                Ok(())
+            } else {
+                Err("Failed to write text to clipboard".to_string())
+            }
+        })
     }
 }
 
@@ -31,20 +33,22 @@ pub fn write_image(base64_str: String) -> Result<(), String> {
         .map_err(|e| format!("Failed to decode base64: {}", e))?;
 
     unsafe {
-        let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
-        let _: () = msg_send![pasteboard, clearContents];
+        objc::rc::autoreleasepool(|| {
+            let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
+            let _: () = msg_send![pasteboard, clearContents];
 
-        let bytes = img_data.as_ptr() as *const std::os::raw::c_void;
-        let nsdata: id = msg_send![class!(NSData), dataWithBytes:bytes length:img_data.len()];
+            let bytes = img_data.as_ptr() as *const std::os::raw::c_void;
+            let nsdata: id = msg_send![class!(NSData), dataWithBytes:bytes length:img_data.len()];
 
-        let image_type = NSString::alloc(nil).init_str("public.tiff");
-        let success: bool = msg_send![pasteboard, setData:nsdata forType:image_type];
+            let image_type = NSString::alloc(nil).init_str("public.tiff");
+            let success: bool = msg_send![pasteboard, setData:nsdata forType:image_type];
 
-        if success {
-            Ok(())
-        } else {
-            Err("Failed to write image to clipboard".to_string())
-        }
+            if success {
+                Ok(())
+            } else {
+                Err("Failed to write image to clipboard".to_string())
+            }
+        })
     }
 }
 

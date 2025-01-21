@@ -63,92 +63,99 @@ pub fn init() {
 }
 
 pub async fn check() {
-    unsafe {
-        let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
-        let types: id = msg_send![pasteboard, types];
+    let record_to_add = unsafe {
+        objc::rc::autoreleasepool(|| {
+            let pasteboard: id = msg_send![class!(NSPasteboard), generalPasteboard];
+            let types: id = msg_send![pasteboard, types];
 
-        // 检查是否包含文件路径
-        let file_url_type = NSString::alloc(nil).init_str("public.file-url");
-        let contains_file_urls: bool = msg_send![types, containsObject: file_url_type];
-        if contains_file_urls {
-            let item: *mut Object = msg_send![types, objectAtIndex: 0];
-            let data: *mut Object = msg_send![pasteboard, dataForType: item];
-            if data.is_null() {
-                return;
+            // 检查是否包含文件路径
+            let file_url_type = NSString::alloc(nil).init_str("public.file-url");
+            let contains_file_urls: bool = msg_send![types, containsObject: file_url_type];
+            if contains_file_urls {
+                let item: *mut Object = msg_send![types, objectAtIndex: 0];
+                let data: *mut Object = msg_send![pasteboard, dataForType: item];
+                if data.is_null() {
+                    return None;
+                }
+                let nsstring: *mut Object = msg_send![class!(NSString), alloc];
+                // UTF8 encoding
+                let nsstring: *mut Object = msg_send![nsstring, initWithData:data encoding:4];
+                // 此时获取都的url是这样的格式: file:///.file/id=6571367.45435786
+                let url_string = nsstring_to_rust_string(nsstring);
+                // 把它转换为标准化的路径
+                if let Some(path) = resolve_file_url(&url_string) {
+                    if LAST_RECORD.lock().unwrap().update("file", &path, None) {
+                        // 获取文件大小
+                        if let Ok(metadata) = fs::metadata(path.clone()) {
+                            let record = RecordInput {
+                                record_type: "file".to_string(),
+                                value: path,
+                                thumbnail: None,
+                                size: Some(metadata.len()),
+                                img_size: None,
+                            };
+                            return Some(record);
+                        }
+                    }
+                }
+                return None;
             }
-            let nsstring: *mut Object = msg_send![class!(NSString), alloc];
-            // UTF8 encoding
-            let nsstring: *mut Object = msg_send![nsstring, initWithData:data encoding:4];
-            // 此时获取都的url是这样的格式: file:///.file/id=6571367.45435786
-            let url_string = nsstring_to_rust_string(nsstring);
-            // 把它转换为标准化的路径
-            if let Some(path) = resolve_file_url(&url_string) {
-                if LAST_RECORD.lock().unwrap().update("file", &path, None) {
-                    // 获取文件大小
-                    if let Ok(metadata) = fs::metadata(path.clone()) {
+
+            // 检查是否包含图片
+            let image_type = NSString::alloc(nil).init_str("public.tiff");
+            let contains_images: bool = msg_send![types, containsObject: image_type];
+            if contains_images {
+                let data: id = msg_send![pasteboard, dataForType: image_type];
+                if !data.is_null() {
+                    let length: usize = msg_send![data, length];
+                    let bytes: *const u8 = msg_send![data, bytes];
+                    let slice = std::slice::from_raw_parts(bytes, length);
+                    let mut last_record = LAST_RECORD.lock().unwrap();
+                    // 在encode前检测图片是不是同一张, 如果一样, encode没有意义
+                    if last_record.is_same_img(&slice) {
+                        return None;
+                    }
+                    let (thumbnail, img_size) = optimize_img(&slice).unwrap();
+                    let img_base64 = STANDARD.encode(slice);
+                    let _ = last_record.update("image", &img_base64, Some(slice.to_vec()));
+
+                    let record = RecordInput {
+                        record_type: "image".to_string(),
+                        value: img_base64,
+                        thumbnail: Some(thumbnail),
+                        size: None,
+                        img_size: Some(img_size),
+                    };
+                    return Some(record);
+                }
+                return None;
+            }
+
+            // 检查是否包含文字
+            let text_type = NSString::alloc(nil).init_str("public.utf8-plain-text");
+            let contains_text: bool = msg_send![types, containsObject: text_type];
+            if contains_text {
+                let string: id = msg_send![pasteboard, stringForType: text_type];
+                if !string.is_null() {
+                    let t = nsstring_to_rust_string(string);
+                    if LAST_RECORD.lock().unwrap().update("text", &t, None) {
                         let record = RecordInput {
-                            record_type: "file".to_string(),
-                            value: path,
+                            record_type: "text".to_string(),
+                            value: t,
                             thumbnail: None,
-                            size: Some(metadata.len()),
+                            size: None,
                             img_size: None,
                         };
-                        add_record(record).await.unwrap();
+                        return Some(record);
                     }
                 }
             }
-            return;
-        }
+            None
+        })
+    };
 
-        // 检查是否包含图片
-        let image_type = NSString::alloc(nil).init_str("public.tiff");
-        let contains_images: bool = msg_send![types, containsObject: image_type];
-        if contains_images {
-            let data: id = msg_send![pasteboard, dataForType: image_type];
-            if !data.is_null() {
-                let length: usize = msg_send![data, length];
-                let bytes: *const u8 = msg_send![data, bytes];
-                let slice = std::slice::from_raw_parts(bytes, length);
-                let mut last_record = LAST_RECORD.lock().unwrap();
-                // 在encode前检测图片是不是同一张, 如果一样, encode没有意义
-                if last_record.is_same_img(&slice) {
-                    return;
-                }
-                let (thumbnail, img_size) = optimize_img(&slice).unwrap();
-                let img_base64 = STANDARD.encode(slice);
-                let _ = last_record.update("image", &img_base64, Some(slice.to_vec()));
-
-                let record = RecordInput {
-                    record_type: "image".to_string(),
-                    value: img_base64,
-                    thumbnail: Some(thumbnail),
-                    size: None,
-                    img_size: Some(img_size),
-                };
-                add_record(record).await.unwrap();
-            }
-            return;
-        }
-
-        // 检查是否包含文字
-        let text_type = NSString::alloc(nil).init_str("public.utf8-plain-text");
-        let contains_text: bool = msg_send![types, containsObject: text_type];
-        if contains_text {
-            let string: id = msg_send![pasteboard, stringForType: text_type];
-            if !string.is_null() {
-                let t = nsstring_to_rust_string(string);
-                if LAST_RECORD.lock().unwrap().update("text", &t, None) {
-                    let record = RecordInput {
-                        record_type: "text".to_string(),
-                        value: t,
-                        thumbnail: None,
-                        size: None,
-                        img_size: None,
-                    };
-                    add_record(record).await.unwrap();
-                }
-            }
-        }
+    if let Some(record) = record_to_add {
+        add_record(record).await.unwrap();
     }
 }
 

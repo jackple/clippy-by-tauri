@@ -1,10 +1,10 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.6",
   "notes": "交互优化",
   "pub_date": "2025-01-20T08:00:00Z",
   "platforms": {
     "macos-universal": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFRpRGFBNmIwcUxLemJCTW5ydXlLdXhHeHdJTi9odTBaTkhYTUUrTmFYMWpGOG9UM2duMUVGSC9BUGNvbHhGMVlvQkkyMTRNSy9NajhEQ0c0UkVUQmdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3MzYzNTY2CWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6CmZPNjRCUXZVdGlBQXovR0tFZDVKelB1QkJ1TmhxazBJMXdXMjU3TXAyMjdueURTdXBaNFdmZXR6a2g1ZlRMS1lHbzlGQ1RydGhyeW52ellxWDczK0F3PT0K",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSdU8vUE9JR0pBOFdKODgvT3EwMkVQOXR6YlMxM3Zwd2FPbG1wNEljMSsycCtnM3k5d2RSNGJibnBpbkh2NkhVOHNkQ0s1aytoUlY4MHRZSTFWVkRVWWFKN09BaHhWd2d3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM3NDIzMDIwCWZpbGU6Y2xpcHB5Mi5hcHAudGFyLmd6CnNYVGpDb3hDcnB0WVJ5NG1xK2l6dEY1ZTlob1JkakZ2MmFOejhLK3V2d2dXNlR4aU81YkNiU20zOVduc0lEa3VCV3Y2RUVPa3lGQmZ1MHNNK2RUckJ3PT0K",
       "url": "https://desktop.yidejia.com/clippy2/clippy2.app.tar.gz"
     }
   }
