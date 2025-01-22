@@ -10,7 +10,11 @@ pub fn run() {
             // https://github.com/tauri-apps/tauri/issues/12128
         }))
         .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(
+            tauri_plugin_updater::Builder::new()
+                .target("macos-universal")
+                .build(),
+        )
         .plugin(tauri_nspanel::init())
         .invoke_handler(tauri::generate_handler![
             utils::nspanel::toggle_panel,
