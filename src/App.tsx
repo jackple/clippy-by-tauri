@@ -3,7 +3,7 @@ import { debounce } from "lodash-es"
 import { invoke } from "@tauri-apps/api/core"
 
 import { getRecords, type Record } from "./utils/db"
-import { SearchInput } from "./components/SearchInput"
+import { Search } from "./components/Search"
 import { RecordList, type RecordListRef } from "./components/RecordList"
 import Updater from "./components/Updater"
 import styles from "./App.module.scss"
@@ -107,7 +107,7 @@ function App() {
   return (
     <main className={styles.container}>
       <Updater />
-      <SearchInput onSearch={handleSearch} />
+      <Search onSearch={handleSearch} />
       <RecordList
         ref={listRef}
         records={records}

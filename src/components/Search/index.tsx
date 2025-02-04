@@ -5,7 +5,7 @@ interface Props {
   onSearch: (keyword: string) => void
 }
 
-export function SearchInput({ onSearch }: Props) {
+export function Search({ onSearch }: Props) {
   const [value, setValue] = useState("")
 
   const handleKeyDown = useCallback(
@@ -34,7 +34,7 @@ export function SearchInput({ onSearch }: Props) {
 
   return (
     <div className={styles.container}>
-      <div className={styles.searchWrapper}>
+      <div className={styles.searchInputWrapper}>
         <i className={styles.searchIcon} />
         <input
           type="text"
