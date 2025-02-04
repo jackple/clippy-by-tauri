@@ -129,6 +129,7 @@ pub struct QueryParams {
     pub last_updated_at: Option<String>,
     pub limit: u32,
     pub keyword: Option<String>,
+    pub record_type: Option<String>,
 }
 
 #[tauri::command]
@@ -153,6 +154,11 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
             conditions.push("record_type IN ('text', 'file') AND value LIKE ?");
             query_params.push(format!("%{}%", keyword));
         }
+    }
+
+    if let Some(record_type) = params.record_type {
+        conditions.push("record_type = ?");
+        query_params.push(record_type);
     }
 
     if let Some(last_updated_at) = params.last_updated_at {

@@ -29,6 +29,7 @@ interface QueryParams {
   last_updated_at?: string
   limit: number
   keyword?: string
+  record_type?: RecordType
 }
 
 export async function getRecords(params: QueryParams): Promise<Record[]> {

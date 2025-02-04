@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, useRef } from "react"
 import { debounce } from "lodash-es"
 import { invoke } from "@tauri-apps/api/core"
 
-import { getRecords, type Record } from "./utils/db"
+import { getRecords, type Record, RecordType } from "./utils/db"
 import { Search } from "./components/Search"
 import { RecordList, type RecordListRef } from "./components/RecordList"
 import Updater from "./components/Updater"
@@ -14,14 +14,25 @@ function App() {
   const [records, setRecords] = useState<Record[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [keyword, setKeyword] = useState("")
+  const [selectedType, setSelectedType] = useState<RecordType | "all">("all")
   const [hasMore, setHasMore] = useState(true)
   const listRef = useRef<RecordListRef>(null)
 
+  const handleSearch = useCallback(
+    (value: string, type: RecordType | "all") => {
+      setKeyword(value)
+      setSelectedType(type)
+      setSelectedId(null) // 重置选中状态
+    },
+    []
+  )
+
   const debouncedLoadRef = useRef(
-    debounce(async (kw: string) => {
+    debounce(async (kw: string, type: RecordType | "all") => {
       const data = await getRecords({
         limit: LIMIT,
         keyword: kw,
+        record_type: type === "all" ? undefined : type,
       })
       setRecords(data)
       setHasMore(data.length === LIMIT)
@@ -32,13 +43,8 @@ function App() {
   )
 
   useEffect(() => {
-    debouncedLoadRef.current(keyword)
-  }, [keyword])
-
-  const handleSearch = useCallback((value: string) => {
-    setKeyword(value)
-    setSelectedId(null) // 重置选中状态
-  }, [])
+    debouncedLoadRef.current(keyword, selectedType)
+  }, [keyword, selectedType])
 
   const loadRecords = useCallback(async () => {
     // 检查是否有新的记录, 如果有, 则重新请求并把第一个选中
@@ -46,6 +52,7 @@ function App() {
       const data0 = await getRecords({
         limit: 1,
         keyword,
+        record_type: selectedType === "all" ? undefined : selectedType,
       })
       if (data0[0]?.id === records[0].id) return
     }
@@ -53,13 +60,14 @@ function App() {
     const data = await getRecords({
       limit: LIMIT,
       keyword,
+      record_type: selectedType === "all" ? undefined : selectedType,
     })
     setRecords(data)
     setHasMore(data.length === LIMIT)
     if (data.length) {
       setSelectedId(data[0].id)
     }
-  }, [keyword, records])
+  }, [keyword, records, selectedType])
 
   const loadMore = useCallback(async () => {
     if (!hasMore) return
@@ -71,11 +79,12 @@ function App() {
       last_updated_at: lastRecord.updated_at,
       limit: LIMIT,
       keyword,
+      record_type: selectedType === "all" ? undefined : selectedType,
     })
 
     setRecords((prev) => [...prev, ...data])
     setHasMore(data.length === LIMIT)
-  }, [hasMore, keyword, records])
+  }, [hasMore, keyword, records, selectedType])
 
   useEffect(() => {
     function handleFocus() {
