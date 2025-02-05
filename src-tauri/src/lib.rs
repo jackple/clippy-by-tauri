@@ -16,6 +16,7 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_nspanel::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             utils::nspanel::toggle_panel,
             utils::db::add_record,
