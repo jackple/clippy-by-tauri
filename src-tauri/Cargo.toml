@@ -1,6 +1,6 @@
 [package]
 name = "clippy2"
-version = "0.1.8"
+version = "0.1.9"
 description = "剪贴板管理工具"
 authors = ["jackple"]
 edition = "2021"
