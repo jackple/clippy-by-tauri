@@ -22,8 +22,41 @@
     font-size: 16px;
   }
 
+  .timeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+  }
+
   .time {
     font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .favoriteIcon {
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    transform-origin: center center;
+
+    &.active {
+      color: #fff;
+    }
+
+    &:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
   }
 }
 

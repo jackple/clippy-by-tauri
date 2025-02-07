@@ -16,20 +16,15 @@ export interface Record {
   created_at: string
   updated_at: string
   is_deleted?: boolean
+  favorite: boolean
 }
-
-// export async function addRecord(
-//   params: Omit<Record, "id" | "created_at" | "updated_at">
-// ): Promise<number> {
-//   console.log("addRecord", params)
-//   return invoke("add_record", { record: params })
-// }
 
 interface QueryParams {
   last_updated_at?: string
   limit: number
   keyword?: string
   record_type?: RecordType
+  favorite?: boolean
 }
 
 export async function getRecords(params: QueryParams): Promise<Record[]> {

@@ -20,6 +20,7 @@ pub struct Record {
     img_size: Option<String>,
     created_at: String,
     updated_at: String,
+    pub favorite: bool,
 }
 
 pub struct Database {
@@ -53,12 +54,20 @@ pub fn init(app: &tauri::App) {
             thumbnail TEXT,
             size INTEGER,
             img_size TEXT,
+            favorite INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )",
         [],
     )
     .unwrap();
+
+    // 确保 favorite 列存在
+    conn.execute(
+        "ALTER TABLE record ADD COLUMN favorite INTEGER DEFAULT 0",
+        [],
+    )
+    .unwrap_or_else(|_| 0);
 
     let mut db = DB.lock().unwrap();
     *db = Some(Database { conn });
@@ -109,8 +118,8 @@ pub async fn add_record(record: RecordInput) -> Result<i64, String> {
     // 如果不存在，插入新记录
     db.conn
         .execute(
-            "INSERT INTO record (record_type, value, thumbnail, size, img_size, updated_at) 
-                 VALUES (?1, ?2, ?3, ?4, ?5, CURRENT_TIMESTAMP)",
+            "INSERT INTO record (record_type, value, thumbnail, size, img_size, favorite, updated_at) 
+                 VALUES (?1, ?2, ?3, ?4, ?5, 0, CURRENT_TIMESTAMP)",
             (
                 record.record_type,
                 record.value,
@@ -130,6 +139,7 @@ pub struct QueryParams {
     pub limit: u32,
     pub keyword: Option<String>,
     pub record_type: Option<String>,
+    pub favorite: Option<bool>,
 }
 
 #[tauri::command]
@@ -143,27 +153,35 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
                 WHEN record_type = 'image' THEN ''
                 ELSE value 
              END as value,
-             thumbnail, size, img_size, created_at, updated_at 
+             thumbnail, size, img_size, favorite, created_at, updated_at 
              FROM record";
 
     let mut conditions = Vec::new();
-    let mut query_params = Vec::new();
+    let mut query_params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
 
     if let Some(keyword) = params.keyword {
         if !keyword.is_empty() {
             conditions.push("record_type IN ('text', 'file') AND value LIKE ?");
-            query_params.push(format!("%{}%", keyword));
+            query_params.push(Box::new(format!("%{}%", keyword)));
         }
     }
 
     if let Some(record_type) = params.record_type {
-        conditions.push("record_type = ?");
-        query_params.push(record_type);
+        if record_type != "all" {
+            conditions.push("record_type = ?");
+            query_params.push(Box::new(record_type));
+        }
     }
 
     if let Some(last_updated_at) = params.last_updated_at {
         conditions.push("updated_at < ?");
-        query_params.push(last_updated_at);
+        query_params.push(Box::new(last_updated_at));
+    }
+
+    if let Some(favorite) = params.favorite {
+        if favorite {
+            conditions.push("favorite = 1");
+        }
     }
 
     let query = if conditions.is_empty() {
@@ -176,12 +194,13 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
         )
     };
 
-    query_params.push(params.limit.to_string());
+    query_params.push(Box::new(params.limit));
 
-    let mut stmt = db.conn.prepare(query.as_str()).map_err(|e| e.to_string())?;
+    let mut stmt = db.conn.prepare(&query).map_err(|e| e.to_string())?;
+    let params_slice: Vec<&dyn rusqlite::ToSql> = query_params.iter().map(|p| p.as_ref()).collect();
 
     let records = stmt
-        .query_map(rusqlite::params_from_iter(query_params), |row| {
+        .query_map(params_slice.as_slice(), |row| {
             Ok(Record {
                 id: row.get(0)?,
                 record_type: row.get(1)?,
@@ -189,8 +208,9 @@ pub async fn get_records(params: QueryParams) -> Result<Vec<Record>, String> {
                 thumbnail: row.get(3)?,
                 size: row.get(4)?,
                 img_size: row.get(5)?,
-                created_at: row.get(6)?,
-                updated_at: row.get(7)?,
+                favorite: row.get::<_, i64>(6)? != 0,
+                created_at: row.get(7)?,
+                updated_at: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -212,4 +232,19 @@ pub async fn get_record_value(id: i64) -> Result<String, String> {
 
     stmt.query_row([id], |row| Ok(row.get(0)?))
         .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn toggle_favorite(id: i64) -> Result<(), String> {
+    let db = Database::get().map_err(|e| e.to_string())?;
+    let db = db.as_ref().unwrap();
+
+    db.conn
+        .execute(
+            "UPDATE record SET favorite = NOT favorite WHERE id = ?1",
+            [id],
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
 }

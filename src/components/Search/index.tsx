@@ -14,6 +14,7 @@ const TYPES = [
   { label: "文本", value: RecordType.Text },
   { label: "图片", value: RecordType.Image },
   { label: "文件", value: RecordType.File },
+  { label: "收藏", value: "favorite" },
 ]
 
 export function Search({ onSearch, onBlur }: Props) {
@@ -51,14 +52,14 @@ export function Search({ onSearch, onBlur }: Props) {
   }, [onSearch, selectedType])
 
   const handleTypeChange = useCallback(
-    (type: RecordType | "all") => {
-      setSelectedType(type)
+    (type: RecordType | "all" | "favorite") => {
+      setSelectedType(type as RecordType | "all")
       // 当切换到图片类型时，清空搜索框
       if (type === RecordType.Image) {
         setValue("")
-        onSearch("", type)
+        onSearch("", type as RecordType | "all")
       } else {
-        onSearch(value, type)
+        onSearch(value, type as RecordType | "all")
       }
     },
     [onSearch, value]

@@ -187,7 +187,7 @@ export const RecordList = forwardRef<RecordListRef, Props>(function RecordList(
             onClick={() => handleClick(record, index)}
             onDoubleClick={() => handleDoubleClick(record)}
           >
-            <RecordItem record={record} />
+            <RecordItem record={record} setRecords={setRecords} />
           </div>
         ))
       )}

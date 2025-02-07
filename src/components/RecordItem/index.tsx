@@ -4,12 +4,16 @@ import fileIcon from "../../assets/file.png"
 import colorIcon from "../../assets/color.png"
 import { type Record } from "../../utils/db"
 import styles from "./styles.module.scss"
+import { useCallback } from "react"
+import { invoke } from "@tauri-apps/api/core"
+import classNames from "classnames"
 
 interface Props {
   record: Record
+  setRecords: React.Dispatch<React.SetStateAction<Record[]>>
 }
 
-export function RecordItem({ record }: Props) {
+export function RecordItem({ record, setRecords }: Props) {
   const getColorValue = (hex: string) => {
     // 如果以#开头，移除#
     let colorValue = hex.startsWith("#") ? hex.substring(1) : hex
@@ -96,6 +100,24 @@ export function RecordItem({ record }: Props) {
 
   const isColor = record.record_type === "text" && isColorValue(record.value)
 
+  const toggleFavorite = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation() // 阻止事件冒泡，避免触发选中效果
+      try {
+        await invoke("toggle_favorite", { id: record.id })
+        // 立即更新当前列表中的收藏状态
+        setRecords((prevRecords) =>
+          prevRecords.map((r) =>
+            r.id === record.id ? { ...r, favorite: !r.favorite } : r
+          )
+        )
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error)
+      }
+    },
+    [record.id, setRecords]
+  )
+
   return (
     <div
       className={styles.container}
@@ -106,7 +128,17 @@ export function RecordItem({ record }: Props) {
           <span>{getTitle()}</span>
           <img src={getIcon()} alt="icon" width={24} height={24} />
         </div>
-        <div className={styles.time}>{getTime()}</div>
+        <div className={styles.timeWrapper}>
+          <div className={styles.time}>{getTime()}</div>
+          <div
+            className={classNames(styles.favoriteIcon, {
+              [styles.active]: record.favorite,
+            })}
+            onClick={toggleFavorite}
+          >
+            {record.favorite ? "★" : "☆"}
+          </div>
+        </div>
       </div>
       <div className={styles.content}>
         {!!record.is_deleted && (

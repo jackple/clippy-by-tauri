@@ -14,12 +14,14 @@ function App() {
   const [records, setRecords] = useState<Record[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [keyword, setKeyword] = useState("")
-  const [selectedType, setSelectedType] = useState<RecordType | "all">("all")
+  const [selectedType, setSelectedType] = useState<
+    RecordType | "all" | "favorite"
+  >("all")
   const [hasMore, setHasMore] = useState(true)
   const listRef = useRef<RecordListRef>(null)
 
   const handleSearch = useCallback(
-    (value: string, type: RecordType | "all") => {
+    (value: string, type: RecordType | "all" | "favorite") => {
       setKeyword(value)
       setSelectedType(type)
       setSelectedId(null) // 重置选中状态
@@ -28,11 +30,12 @@ function App() {
   )
 
   const debouncedLoadRef = useRef(
-    debounce(async (kw: string, type: RecordType | "all") => {
+    debounce(async (kw: string, type: RecordType | "all" | "favorite") => {
       const data = await getRecords({
         limit: LIMIT,
         keyword: kw,
-        record_type: type === "all" ? undefined : type,
+        record_type: type === "all" || type === "favorite" ? undefined : type,
+        favorite: type === "favorite",
       })
       setRecords(data)
       setHasMore(data.length === LIMIT)
@@ -52,7 +55,11 @@ function App() {
       const data0 = await getRecords({
         limit: 1,
         keyword,
-        record_type: selectedType === "all" ? undefined : selectedType,
+        record_type:
+          selectedType === "all" || selectedType === "favorite"
+            ? undefined
+            : selectedType,
+        favorite: selectedType === "favorite",
       })
       if (data0[0]?.id === records[0].id) return
     }
@@ -60,7 +67,11 @@ function App() {
     const data = await getRecords({
       limit: LIMIT,
       keyword,
-      record_type: selectedType === "all" ? undefined : selectedType,
+      record_type:
+        selectedType === "all" || selectedType === "favorite"
+          ? undefined
+          : selectedType,
+      favorite: selectedType === "favorite",
     })
     setRecords(data)
     setHasMore(data.length === LIMIT)
@@ -79,7 +90,11 @@ function App() {
       last_updated_at: lastRecord.updated_at,
       limit: LIMIT,
       keyword,
-      record_type: selectedType === "all" ? undefined : selectedType,
+      record_type:
+        selectedType === "all" || selectedType === "favorite"
+          ? undefined
+          : selectedType,
+      favorite: selectedType === "favorite",
     })
 
     setRecords((prev) => [...prev, ...data])

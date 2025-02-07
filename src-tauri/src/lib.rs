@@ -21,6 +21,7 @@ pub fn run() {
             utils::nspanel::toggle_panel,
             utils::db::add_record,
             utils::db::get_records,
+            utils::db::toggle_favorite,
             utils::clipboard_write::choose,
         ])
         .setup(|app: &mut tauri::App| {
