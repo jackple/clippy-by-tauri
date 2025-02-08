@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useRef } from "react"
 import { debounce } from "lodash-es"
 import { invoke } from "@tauri-apps/api/core"
+import { listen } from "@tauri-apps/api/event"
 
 import { getRecords, type Record, RecordType } from "./utils/db"
 import { Search } from "./components/Search"
@@ -124,8 +125,13 @@ function App() {
       }
     }
 
+    const unlisten = listen("history-cleared", () => location.reload())
+
     window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+      unlisten.then((f) => f())
+    }
   }, [])
 
   return (

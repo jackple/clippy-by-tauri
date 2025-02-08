@@ -248,3 +248,20 @@ pub async fn toggle_favorite(id: i64) -> Result<(), String> {
 
     Ok(())
 }
+
+pub async fn clear_history() -> Result<(), String> {
+    let db = Database::get().map_err(|e| e.to_string())?;
+    let db = db.as_ref().unwrap();
+
+    db.conn
+        .execute(
+            "DELETE FROM record WHERE id NOT IN (
+                SELECT id FROM record 
+                ORDER BY updated_at DESC LIMIT 1
+            )",
+            [],
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
