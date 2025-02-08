@@ -21,3 +21,12 @@ $tool cp -r -u src-tauri/target/universal-apple-darwin/release/bundle/dmg/ $remo
 $tool cp -r -u src-tauri/target/universal-apple-darwin/release/bundle/macos/clippy2.app.tar.gz $remotePath $meta $configFile
 $tool cp -r -u update/updater.json $remotePath $meta $configFile
 
+# 获取脚本所在目录的上级目录的绝对路径（项目根目录）
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# 切换到项目根目录并执行 git 命令
+cd "$PROJECT_ROOT"
+git add update/updater.json
+git commit -m "chore: updater for update checking"
+
+echo "Changes committed to git successfully!"
