@@ -5,6 +5,8 @@
   height: 100%;
   min-height: 0;
   padding-bottom: 8px;
+  overflow: hidden;
+  height: 240px;
 }
 
 .header {
@@ -36,26 +38,73 @@
 
   .favoriteIcon {
     cursor: pointer;
-    font-size: 15px;
-    line-height: 1;
-    color: rgba(255, 255, 255, 0.6);
-    transition: all 0.2s ease;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.75);
+    position: relative;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
-    user-select: none;
-    transform-origin: center center;
+    justify-content: center;
+
+    // 扩大点击和悬停区域
+    &::after {
+      content: "";
+      position: absolute;
+      left: -6px;
+      right: -6px;
+      top: -6px;
+      bottom: -6px;
+    }
+
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      padding: 6px 10px;
+      background-color: rgba(0, 0, 0, 0.85);
+      background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.07),
+        rgba(255, 255, 255, 0)
+      );
+      color: white;
+      font-size: 12px;
+      line-height: 1.2;
+      border-radius: 3px;
+      white-space: nowrap;
+      z-index: 1000;
+      box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top right;
+      backface-visibility: hidden;
+      will-change: transform, opacity;
+
+      // 设置为绝对定位，但相对于容器右侧对齐
+      top: calc(100% + 6px);
+      right: -8px;
+      transform: translateX(0) translateY(-4px) scale(0.95);
+
+      &::before {
+        content: "";
+        position: absolute;
+        right: 12px;
+        top: -3px;
+        border: 3px solid transparent;
+        border-bottom-color: rgba(0, 0, 0, 0.85);
+      }
+    }
+
+    &:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(0) translateY(0) scale(1);
+    }
 
     &.active {
-      color: #fff;
-    }
-
-    &:hover {
-      color: #fff;
-      transform: scale(1.1);
-    }
-
-    &:active {
-      transform: scale(0.95);
+      color: #f0b429;
+      text-shadow: 0 0 2px rgba(240, 180, 41, 0.3);
     }
   }
 }

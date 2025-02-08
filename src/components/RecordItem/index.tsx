@@ -1,12 +1,13 @@
+import { useCallback, useRef } from "react"
+import { invoke } from "@tauri-apps/api/core"
+import classNames from "classnames"
+
 import textIcon from "../../assets/text.png"
 import picIcon from "../../assets/pic.png"
 import fileIcon from "../../assets/file.png"
 import colorIcon from "../../assets/color.png"
 import { type Record } from "../../utils/db"
 import styles from "./styles.module.scss"
-import { useCallback } from "react"
-import { invoke } from "@tauri-apps/api/core"
-import classNames from "classnames"
 
 interface Props {
   record: Record
@@ -100,20 +101,18 @@ export function RecordItem({ record, setRecords }: Props) {
 
   const isColor = record.record_type === "text" && isColorValue(record.value)
 
+  const favoriteRef = useRef<HTMLDivElement>(null)
+
   const toggleFavorite = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation() // 阻止事件冒泡，避免触发选中效果
-      try {
-        await invoke("toggle_favorite", { id: record.id })
-        // 立即更新当前列表中的收藏状态
-        setRecords((prevRecords) =>
-          prevRecords.map((r) =>
-            r.id === record.id ? { ...r, favorite: !r.favorite } : r
-          )
+      await invoke("toggle_favorite", { id: record.id })
+      // 立即更新当前列表中的收藏状态
+      setRecords((prevRecords) =>
+        prevRecords.map((r) =>
+          r.id === record.id ? { ...r, favorite: !r.favorite } : r
         )
-      } catch (error) {
-        console.error("Failed to toggle favorite:", error)
-      }
+      )
     },
     [record.id, setRecords]
   )
@@ -131,12 +130,17 @@ export function RecordItem({ record, setRecords }: Props) {
         <div className={styles.timeWrapper}>
           <div className={styles.time}>{getTime()}</div>
           <div
+            ref={favoriteRef}
             className={classNames(styles.favoriteIcon, {
               [styles.active]: record.favorite,
             })}
             onClick={toggleFavorite}
+            onDoubleClick={(e) => e.stopPropagation()}
           >
             {record.favorite ? "★" : "☆"}
+            <div className={styles.tooltip}>
+              {record.favorite ? "取消收藏" : "收藏"}
+            </div>
           </div>
         </div>
       </div>
