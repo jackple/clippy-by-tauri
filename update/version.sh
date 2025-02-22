@@ -39,6 +39,9 @@ sed -i '' "s/\"version\": \"${VERSION_PATTERN}\"/\"version\": \"$NEW_VERSION\"/"
 
 echo "Version updated to $NEW_VERSION in all files successfully!"
 
+# 等待 1 秒，确保 Cargo.lock 更新完成
+sleep 1
+
 # 切换到项目根目录并执行 git 命令
 cd "$PROJECT_ROOT"
 git add package.json src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json
