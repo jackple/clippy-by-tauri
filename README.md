@@ -1,7 +1,19 @@
+# 更新版本号
+
+```sh
+./update/version.sh 0.1.11
+```
+
 # 构建 mac universal 包
 
 ```sh
 yarn tauri build --target universal-apple-darwin
+```
+
+# 发布包
+
+```sh
+./update/update.sh
 ```
 
 # 构建 icon

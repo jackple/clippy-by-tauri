@@ -169,7 +169,7 @@ export function RecordItem({ record, setRecords }: Props) {
                 : undefined
             }
           >
-            {record.value}
+            {record.display_text || record.value}
           </div>
         )}
       </div>
