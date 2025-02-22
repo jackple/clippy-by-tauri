@@ -51,20 +51,7 @@ function App() {
   }, [keyword, selectedType])
 
   const loadRecords = useCallback(async () => {
-    // 检查是否有新的记录, 如果有, 则重新请求并把第一个选中
-    if (records.length) {
-      const data0 = await getRecords({
-        limit: 1,
-        keyword,
-        record_type:
-          selectedType === "all" || selectedType === "favorite"
-            ? undefined
-            : selectedType,
-        favorite: selectedType === "favorite",
-      })
-      if (data0[0]?.id === records[0].id) return
-    }
-
+    // 检查是否有新的记录, 如果没有, 则不更新
     const data = await getRecords({
       limit: LIMIT,
       keyword,
@@ -74,6 +61,10 @@ function App() {
           : selectedType,
       favorite: selectedType === "favorite",
     })
+    if (records.length) {
+      if (data[0]?.id === records[0].id) return
+    }
+
     setRecords(data)
     setHasMore(data.length === LIMIT)
     if (data.length) {
