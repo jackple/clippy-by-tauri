@@ -1,0 +1,43 @@
+[package]
+name = "clippy2"
+version = "0.1.13"
+description = "剪贴板管理工具"
+authors = ["jackple"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "clippy_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.2.2", features = ["devtools", "tray-icon", "image-png"] }
+lazy_static = "1.5.0"
+tokio = "1.42.0"
+cocoa = "0.26.0"
+objc = "0.2.7"
+base64 = "0.22.1"
+libc = "0.2.169"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2" }
+core-graphics = "0.24.0"
+objc2-app-kit = "0.2.2"
+rusqlite = "0.32.1"
+image = "0.25.5"
+imagequant = "4.3.3"
+lodepng = "3.10.7"
+tauri-plugin-process = "2"
+tauri-plugin-dialog = "2"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-updater = "2"

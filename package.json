@@ -1,0 +1,32 @@
+{
+  "name": "clippy",
+  "private": true,
+  "version": "0.1.13",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_OPTIONS='--max-http-header-size=128000' vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "~2",
+    "@tauri-apps/plugin-process": "~2",
+    "@tauri-apps/plugin-updater": "~2",
+    "classnames": "^2.5.1",
+    "lodash-es": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.2.4",
+    "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass-embedded": "^1.83.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.5"
+  }
+}

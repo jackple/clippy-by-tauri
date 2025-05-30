@@ -1,0 +1,13 @@
+{
+  "identifier": "desktop-capability",
+  "platforms": ["macOS"],
+  "windows": ["main"],
+  "permissions": [
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "updater:default",
+    "process:default",
+    "dialog:default"
+  ]
+}
