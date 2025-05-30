@@ -1,4 +1,4 @@
-![应用截图](https://github.com/jackple/clippy-by-tauri/blob/master/screenshot.jpg?raw=true)
+![应用截图](https://github.com/jackple/clippy-by-tauri/blob/main/screenshot.jpg?raw=true)
 
 # 本地启用
 
