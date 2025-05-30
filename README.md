@@ -1,5 +1,14 @@
 ![应用截图](https://github.com/jackple/clippy-by-tauri/blob/main/screenshot.jpg?raw=true)
 
+# 本地配置
+
+更新配置: `src-tauri/tauri.conf.json`
+
+```sh
+"pubkey": "xxx",
+"endpoints": ["https://xx.com/clippy2/updater.json"]
+```
+
 # 本地启用
 
 ```sh
